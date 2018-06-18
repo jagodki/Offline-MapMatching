@@ -31,6 +31,9 @@ from .resources import *
 from .offline_map_matching_dialog import OfflineMapMatchingDialog
 import os.path
 
+#import own classes
+from mm.map_matcher import MapMatcher
+
 
 class OfflineMapMatching:
     """QGIS Plugin Implementation."""
@@ -70,6 +73,13 @@ class OfflineMapMatching:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'OfflineMapMatching')
         self.toolbar.setObjectName(u'OfflineMapMatching')
+        
+        #create additional instance vars
+        self.map_matcher = MapMatching()
+        
+        #connect slots and signals
+        self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.populateComboBox("fields"))
+        self.dlg.radioButton_dijkstra.toggeld.connect(self.enableDatabaseFields())
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -184,12 +194,36 @@ class OfflineMapMatching:
 
     def run(self):
         """Run method that performs all the real work"""
+        #populate the comboboxes with the available layers
+        self.populateComboBox("network")
+        self.populateComboBox("trajectory")
+        self.populateComboBox("fields")
+        
+        #enable/disable fields for database connection
+        self.enableDatabaseFields()
+        
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
-        result = self.dlg.exec_()
+        #result = self.dlg.exec_()
         # See if OK was pressed
-        if result:
+        #if result:
             # Do something useful here - delete the line containing pass and
             # substitute with your code.
-            pass
+            #pass
+    
+    def populateComboBox(self, type):
+        """Populate the given combobox."""
+        if type == "network":
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.combobox_network, "LINESTRING")
+        elif type == "trajectory":
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.combobox_trajectory, "POINT")
+        elif type == "fields":
+            self.map_matcher.fillAttributeComboBox(self, self.dlg.combobox_trajectoryID, self.dlg.comboBox_trajectory.currentText())
+    
+    def enableDatabaseFields(self):
+        """Enable or disable all GUI-elements related to the database connection, if dijkstra-algoritm is checked or not."""
+        if self.dlg.radioButton_dijkstra.isChecked():
+            self.dlg.formLayout.setEnabled(True)
+        else:
+            self.dlg.formLayout.setEnabled(False)
