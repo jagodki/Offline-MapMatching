@@ -9,9 +9,9 @@
 [general]
 name=Offline-MapMatching
 qgisMinimumVersion=3.0
-description=a plugin to for map matching a trajetory using algirthms of viterbi and dijkstra
+description=a plugin for map matching a trajetory using algorithms of viterbi and dijkstra
 version=1.0
-author=Christoph Junh
+author=Christoph Jung
 email=jagodki.cj@gmail.com
 
 about=Provide a brief description of the plugin and its purpose.

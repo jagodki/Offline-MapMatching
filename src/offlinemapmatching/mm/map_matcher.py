@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QProgressBar, QComboBox, QLabel
 from qgis.core import *
-from hidden_states.hidden_model import *
-from observation.netowrk import *
-from observation.trajectory import *
+from .hidden_states.hidden_model import *
+from .observation.netowrk import *
+from .observation.trajectory import *
 
 class MapMatcher:
     

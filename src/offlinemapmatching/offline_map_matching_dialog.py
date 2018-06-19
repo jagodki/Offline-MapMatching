@@ -8,7 +8,7 @@
                              -------------------
         begin                : 2018-06-14
         git sha              : $Format:%H$
-        copyright            : (C) 2018 by Christoph Junh
+        copyright            : (C) 2018 by Christoph Jung
         email                : jagodki.cj@gmail.com
  ***************************************************************************/
 

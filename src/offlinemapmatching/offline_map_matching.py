@@ -8,7 +8,7 @@
                               -------------------
         begin                : 2018-06-14
         git sha              : $Format:%H$
-        copyright            : (C) 2018 by Christoph Junh
+        copyright            : (C) 2018 by Christoph Jung
         email                : jagodki.cj@gmail.com
  ***************************************************************************/
 
@@ -32,7 +32,7 @@ from .offline_map_matching_dialog import OfflineMapMatchingDialog
 import os.path
 
 #import own classes
-from mm.map_matcher import MapMatcher
+from .mm.map_matcher import MapMatcher
 
 
 class OfflineMapMatching:
