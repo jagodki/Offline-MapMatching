@@ -64,19 +64,20 @@ class HiddenModel:
                     transition.set_transition_probability()
                 
                 #find the highest probability (product of previous prob., trans. prob. and em. prob.)
-                max_prob = (last_viterbi_entry["probability"] * transition.transition_probability * transition.end.emitted_probability) for transition in transitions
+                for transition in transitions:
+                    max_prob = (last_viterbi_entry["probability"] * transition.transition_probability * transition.end.emitted_probability)
                 
                 for transition in transitions:
                     if (last_viterbi_entry["probability"] * transition.transition_probability * transition.end.emitted_probability) == max_prob:
                         
                         #add the candidate with the highest prob. product to the viterbi path
                         viterbi_path.append({"vertex": transition.end},
-                                             "probability": max_prob})
+                                            {"probability": max_prob})
                         break
             else:
                 #add the start vertice to the viterbi path, if we are at the first observation of our trajectory
-                viterbi_path.append({"vertex": transition.start,
-                                     "probability": transition.start.probability})
+                viterbi_path.append({"vertex": transition.start},
+                                    {"probability": transition.start.probability})
             
             #edit the previous observation
             previous_observation = observation
@@ -144,12 +145,12 @@ class HiddenModel:
                         transition.setDirectionProbability(previous_observation, observation)
                         
                         #insert the new transition as a new linestring into our database table
-                        sql_insert_transition = "INSERT INTO omm.network(observation1, observation2, cost, geom) VALUES(" +
+                        sql_insert_transition = ("INSERT INTO omm.network(observation1, observation2, cost, geom) VALUES(" +
                                                 str(i - 1) + ", " + str(i) + ", " + str(transition.transition_probability * 
                                                 transition.start.emitted_probability * transition.end.emitted_probability) +
                                                 ", ST_MakeLine(ST_SetSRID(ST_MakePoint(" + str(transition.start.point.x) + ", " +
                                                 str(transition.start.point.y) + "), " + str(crs) + "), ST_SetSRID(ST_MakePoint(" +
-                                                str(transition.end.point.x) + ", " + str(transition.end.point.y) + "), " + str(crs) + ")));"
+                                                str(transition.end.point.x) + ", " + str(transition.end.point.y) + "), " + str(crs) + ")));")
                         cur.execute(sql_insert_transition)
             pb.setValue(pb.value() + 1)
         
@@ -205,10 +206,10 @@ class HiddenModel:
         rows = cur.fetchall()
             for row in rows:
                 if len(points) == 0:
-                    points.append({"vertex": self.trajectory.observations[row[1]],
-                                   "probability": row[3]})
-                points.append({"vertex": self.trajectory.observations[row[2]],
-                               "probability": row[3]})
+                    points.append({"vertex": self.trajectory.observations[row[1]]},
+                                  {"probability": row[3]})
+                points.append({"vertex": self.trajectory.observations[row[2]]},
+                              {"probability": row[3]})
         pb.setValue(pb.value() + 1)
         
         con.close()
