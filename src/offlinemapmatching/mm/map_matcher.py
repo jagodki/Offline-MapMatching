@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QProgressBar, QComboBox, QLabel
 from qgis.core import *
 from .hidden_states.hidden_model import *
-from .observation.netowrk import *
+from .observation.network import *
 from .observation.trajectory import *
 
 class MapMatcher:
@@ -9,9 +9,9 @@ class MapMatcher:
     def __init__(self):
         self.layers = []
         self.attributes = []
-        self.hidden_model = null
-        self.network = null
-        self.trajectoy = null
+        self.hidden_model = None
+        self.network = None
+        self.trajectoy = None
     
     def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label):
         label.setText("1/3: set up the hidden model")
@@ -71,7 +71,7 @@ class MapMatcher:
         for layer in self.layers:
             if layer.name() == layername:
                 return layer
-        return null
+        return None
     
     def setUp(self, line_layer, point_layer, point_attr):
         self.trajectory = Trajectory(self.getLayer(point_layer), point_attr)

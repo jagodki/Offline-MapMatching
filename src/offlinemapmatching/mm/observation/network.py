@@ -1,9 +1,9 @@
-from qgis.networkanalysis import *
+from qgis.analysis import *
 from qgis.core import *
 
 class Network:
     
-    def __init__(self, linestring_layer)
+    def __init__(self, linestring_layer):
         self.v_layer = linestring_layer
     
     def routing(self, start, end):

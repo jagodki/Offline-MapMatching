@@ -1,6 +1,6 @@
-from ..observations.network import *
-from ..observations.trajectory import *
-from ..observations.observation import *
+from ..observation.network import *
+from ..observation.trajectory import *
+from ..observation.observation import *
 from .candidate import *
 from .transition import *
 from qgis.core import *
@@ -172,7 +172,7 @@ class HiddenModel:
         
         #get all end IDs
         end_ids = []
-        sql_select_end_ids = "SELECT id FROM omm.network WHERE observation1 = " + str(len(self.trajectory.observations))) + ";"
+        sql_select_end_ids = "SELECT id FROM omm.network WHERE observation1 = " + str(len(self.trajectory.observations)) + ";"
         cur.execute(sql_select_end_ids)
         rows = cur.fetchall()
         for row in rows:
@@ -184,9 +184,9 @@ class HiddenModel:
         start_end = []
         for start_id in start_ids:
             for end_id in end_ids:
-                sql_routing = "SELECT * FROM pgr_dijkstra(" +
-                              "'SELECT a.id, a.source, a.target, b.cost FROM edge_table a, omm.network b WHERE a.id = b.id', " +
-                              str(start_id) + ", " + str(end_id) + ");"
+                sql_routing = ("SELECT * FROM pgr_dijkstra(" +
+                               "'SELECT a.id, a.source, a.target, b.cost FROM edge_table a, omm.network b WHERE a.id = b.id', " +
+                               str(start_id) + ", " + str(end_id) + ");")
                 cur.execute(sql_routing)
                 rows = cur.fetchall()
                 for row in rows:
@@ -196,20 +196,20 @@ class HiddenModel:
         pb.setValue(pb.value() + 1)
         
         #get all points of the shortest track
-        sql_final_routing = "SELECT a.id, a.observation1, b.observation2, a.cost "
-                            "FROM omm.network a, " +
-                            "(SELECT * FROM pgr_dijkstra('SELECT a.id, a.source, a.target, b.cost FROM edge_table a, omm.network b WHERE a.id = b.id', " +
-                            str(start_end[0]) + ", " + str(start_end[1]) + ")) b " +
-                            "WHERE a.id = b.id"
+        sql_final_routing = ("SELECT a.id, a.observation1, b.observation2, a.cost "
+                             "FROM omm.network a, " +
+                             "(SELECT * FROM pgr_dijkstra('SELECT a.id, a.source, a.target, b.cost FROM edge_table a, omm.network b WHERE a.id = b.id', " +
+                             str(start_end[0]) + ", " + str(start_end[1]) + ")) b " +
+                             "WHERE a.id = b.id")
         cur.execute(sql_final_routing)
         points = []
         rows = cur.fetchall()
-            for row in rows:
-                if len(points) == 0:
-                    points.append({"vertex": self.trajectory.observations[row[1]]},
-                                  {"probability": row[3]})
-                points.append({"vertex": self.trajectory.observations[row[2]]},
+        for row in rows:
+            if len(points) == 0:
+                points.append({"vertex": self.trajectory.observations[row[1]]},
                               {"probability": row[3]})
+            points.append({"vertex": self.trajectory.observations[row[2]]},
+                          {"probability": row[3]})
         pb.setValue(pb.value() + 1)
         
         con.close()

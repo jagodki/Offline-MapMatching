@@ -1,5 +1,5 @@
 from .network import *
-from ..hidden.candidate import *
+from ..hidden_states.candidate import *
 from qgis.core import *
 
 class Observation:

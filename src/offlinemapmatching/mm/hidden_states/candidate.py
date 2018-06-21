@@ -1,5 +1,5 @@
 import math
-from ..observers.observer import *
+from ..observation.observation import *
 
 class Candidate:
     

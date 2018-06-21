@@ -75,7 +75,7 @@ class OfflineMapMatching:
         self.toolbar.setObjectName(u'OfflineMapMatching')
         
         #create additional instance vars
-        self.map_matcher = MapMatching()
+        self.map_matcher = MapMatcher()
         
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.populateComboBox("fields"))
@@ -215,11 +215,11 @@ class OfflineMapMatching:
     def populateComboBox(self, type):
         """Populate the given combobox."""
         if type == "network":
-            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.combobox_network, "LINESTRING")
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_network, "LINESTRING")
         elif type == "trajectory":
-            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.combobox_trajectory, "POINT")
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_trajectory, "POINT")
         elif type == "fields":
-            self.map_matcher.fillAttributeComboBox(self, self.dlg.combobox_trajectoryID, self.dlg.comboBox_trajectory.currentText())
+            self.map_matcher.fillAttributeComboBox(self.dlg.comboBox_trajectoryID, self.dlg.comboBox_trajectory.currentText())
     
     def enableDatabaseFields(self):
         """Enable or disable all GUI-elements related to the database connection, if dijkstra-algoritm is checked or not."""
