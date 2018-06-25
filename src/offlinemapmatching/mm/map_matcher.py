@@ -61,7 +61,8 @@ class MapMatcher:
         
         #extract all attributes
         layer = self.getLayer(layername)
-        self.attributes = layer.fields()
+        if layer is not None:
+            self.attributes = layer.fields()
         
         #populate the combobox
         for attr in self.attributes:
