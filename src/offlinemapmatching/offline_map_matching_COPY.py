@@ -79,6 +79,7 @@ class OfflineMapMatching:
         
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
+        self.dlg.radioButton_dijkstra.toggled.connect(self.enableDatabaseFields)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -198,6 +199,9 @@ class OfflineMapMatching:
         self.populateComboBox("trajectory")
         self.populateComboBox("fields")
         
+        #enable/disable fields for database connection
+        self.enableDatabaseFields()
+        
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -216,6 +220,13 @@ class OfflineMapMatching:
             self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_trajectory, "POINT")
         elif type == "fields":
             self.map_matcher.fillAttributeComboBox(self.dlg.comboBox_trajectoryID, self.dlg.comboBox_trajectory.currentText())
+    
+    def enableDatabaseFields(self):
+        """Enable or disable all GUI-elements related to the database connection, if dijkstra-algoritm is checked or not."""
+        if self.dlg.radioButton_dijkstra.isChecked():
+            self.dlg.formLayout.setEnabled(True)
+        else:
+            self.dlg.formLayout.setEnabled(False)
 
     def startPopulateFieldsComboBox(self):
         self.populateComboBox("fields")

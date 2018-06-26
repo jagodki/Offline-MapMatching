@@ -47,11 +47,11 @@ class MapMatcher:
         
         #get all layers in the current QGIS project
         self.layers = []
-        self.layers = iface.legendInterface().layers()
+        self.layers = iface.mapCanvas().layers()
         
         #populate the combobox
         for layer in self.layers:
-            if (layer.wkbType() == QGis.WKBPoint and geom_type == "POINT") or (layer.wkbType() == QGis.WKBLineString and geom_type == "LINESTRING"):
+            if (layer.wkbType() == QgsWkbTypes.Point and geom_type == "POINT") or (layer.wkbType() == QgsWkbTypes.LineString and geom_type == "LINESTRING"):
                 combobox.addItem(layer.name())
         
     
