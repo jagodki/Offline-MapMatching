@@ -79,7 +79,7 @@ class OfflineMapMatching:
         
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
-        self.dlg.button_start.clicked.connect(self.startMapMatching)
+        self.dlg.pushButton_start.clicked.connect(self.startMapMatching)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -222,7 +222,7 @@ class OfflineMapMatching:
         self.populateComboBox("fields")
     
     def startMapMatching(self):
-        self.map_maptcher.startViterbiMatching(self.dlg.progressBar,
+        self.map_matcher.startViterbiMatching(self.dlg.progressBar,
                                                self.dlg.comboBox_trajectory.currentText(),
                                                self.dlg.comboBox_network.currentText(),
                                                self.dlg.comboBox_trajectoryID.currentText(),

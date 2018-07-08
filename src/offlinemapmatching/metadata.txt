@@ -9,7 +9,7 @@
 [general]
 name=Offline-MapMatching
 qgisMinimumVersion=3.0
-description=a plugin for map matching a trajetory using algorithms of viterbi and dijkstra
+description=a plugin for map matching a trajectory using the principles of hidden markow models and Viterbi algorithm
 version=1.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
@@ -26,7 +26,7 @@ repository=https://github.com/jagodki/Offline-MapMatching
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=trajectory map matching dijkstra viterbi
+tags=trajectory map matching viterbi hmm
 
 homepage=https://github.com/jagodki/Offline-MapMatching
 category=Vector
