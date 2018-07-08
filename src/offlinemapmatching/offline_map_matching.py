@@ -226,7 +226,7 @@ class OfflineMapMatching:
                                                self.dlg.comboBox_trajectory.currentText(),
                                                self.dlg.comboBox_network.currentText(),
                                                self.dlg.comboBox_trajectoryID.currentText(),
-                                               self.dlg.spinBox_sigma.value(),
-                                               self.dlg.spinBox_my.value(),
-                                               self.dlg.spinBox_max_dist.value(),
+                                               self.dlg.doubleSpinBox_sigma.value(),
+                                               self.dlg.doubleSpinBox_my.value(),
+                                               self.dlg.doubleSpinBox_max.value(),
                                                self.dlg.label_info)
