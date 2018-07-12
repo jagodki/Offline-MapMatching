@@ -16,7 +16,9 @@ class HiddenModel:
     def findViterbiPath(self, maximum_distance, sigma, my, pb):
         #init progressbar
         pb.setValue(0)
-        pb.maximum(len(self.trajectory.observations))
+        max_len = len(self.trajectory.observations)
+        print(str(max_len))
+        pb.maximum(int(max_len))
         
         #init an empty viterbi path to store candidates
         viterbi_path = []

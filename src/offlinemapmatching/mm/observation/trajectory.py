@@ -13,7 +13,7 @@ class Trajectory:
             id = feature[id_field]
             
             #create a new observation object and add them to our observation list
-            obs = observation(point, id)
+            obs = Observation(point, id)
             self.observations.append(obs)
     
 
