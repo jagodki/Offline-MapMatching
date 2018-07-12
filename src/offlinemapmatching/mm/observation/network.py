@@ -4,16 +4,16 @@ from qgis.core import *
 class Network:
     
     def __init__(self, linestring_layer):
-        self.v_layer = linestring_layer
+        self.vector_layer = linestring_layer
     
     def routing(self, start, end):
         #create director and strategy
-        director = QgsLineVectorLayerDirector(self.v_layer, -1, '', '', '', 3)
+        director = QgsLinevector_layerDirector(self.vector_layer, -1, '', '', '', 3)
         properter = QgsDistanceArcProperter()
         director.addProperter(properter)
         
         #buildiung the graph
-        builder = QgsGraphBuilder(self.v_layer.sourceCrs())
+        builder = QgsGraphBuilder(self.vector_layer.sourceCrs())
         tiedPoints = director.makeGraph(builder, [start, end])
         graph = builder.graph()
         start_id = graph.findVertex(tiedPoints[0])

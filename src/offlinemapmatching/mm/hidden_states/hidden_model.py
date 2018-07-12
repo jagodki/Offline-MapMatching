@@ -16,21 +16,19 @@ class HiddenModel:
     def findViterbiPath(self, maximum_distance, sigma, my, pb):
         #init progressbar
         pb.setValue(0)
-        max_len = len(self.trajectory.observations)
-        print(str(max_len))
-        pb.maximum(int(max_len))
+        pb.setMaximum(len(self.trajectory.observations))
         
         #init an empty viterbi path to store candidates
         viterbi_path = []
         
         #init the previous observation
-        previous_observation = null
+        previous_observation = None
         
         #iterate over all observations from our trajectory
         for observation in self.trajectory.observations:
             
             #extract all candidates for the current observation
-            candidates = observation.getCandidates(self.network, maximum_distance)
+            candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
             if len(candidates) == 0:
                 return -5
             
@@ -39,7 +37,7 @@ class HiddenModel:
                 candidate.calculateEmittedProbability(observation, sigma, my)
             
             #check whether we have the starting observation or not
-            if previous_observation is not null and len(viterbi_path) > 0:
+            if previous_observation is not None and len(viterbi_path) > 0:
                 #get the last entry of the viterbi path
                 last_viterbi_entry = viterbi_path[len(viterbi_path) - 1]
                 
@@ -89,8 +87,8 @@ class HiddenModel:
     
     def findDijkstraPath(self, host, port, database, user, password, crs, pb):
         #create database connection
-        cur = null
-        conn = null
+        cur = None
+        conn = None
         try:
             conn = psycopg2.connect("host=" + host + " port=" + port + " dbname=" + database + " user=" + user + " password=" + password)
             conn.autocommit = True
@@ -119,11 +117,11 @@ class HiddenModel:
         pb.maximum(len(self.trajectory.observations) + 5)
         
         #import data to postgis
-        previous_observation = null
+        previous_observation = None
         for i, observation in enumerate(self.trajectory.observations):
             
             #skip the first observation, because there is no previous observation
-            if previous_observation is not null:
+            if previous_observation is not None:
                 
                 #extract all candidates of the current and previous observation
                 current_candidates = observation.getCandidates(self.network, maximum_distance)
