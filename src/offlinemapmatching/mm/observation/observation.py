@@ -11,7 +11,8 @@ class Observation:
     def getCandidates(self, network_layer, max_distance):
         candidates = []
         for feature in network_layer.getFeatures():
-            if self.point.distance(feature.geometry()) <= max_distance:
-                candidates.append(Candidate(self.point.nearestPoint(feature.geometry())))
+            polyline = feature.geometry()
+            if self.point.distance(polyline) <= max_distance:
+                candidates.append(Candidate(self.point.nearestPoint(polyline)))
         return candidates
     

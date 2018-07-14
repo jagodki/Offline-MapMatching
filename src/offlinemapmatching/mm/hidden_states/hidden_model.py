@@ -44,7 +44,7 @@ class HiddenModel:
                 #create transitions between candidates and last viterbi vertex
                 transitions = []
                 for candidate in candidates:
-                    transition.append(Transition(last_viterbi_entry["vertex"], candidate))
+                    transitions.append(Transition(last_viterbi_entry["vertex"], candidate))
                 
                 #calculate probabilities of the transitions (direction and length) and totalise them
                 sum_routing_probability = 0.0
@@ -71,13 +71,21 @@ class HiddenModel:
                     if (last_viterbi_entry["probability"] * transition.transition_probability * transition.end.emitted_probability) == max_prob:
                         
                         #add the candidate with the highest prob. product to the viterbi path
-                        viterbi_path.append({"vertex": transition.end},
-                                            {"probability": max_prob})
+                        viterbi_path.append({"vertex": transition.end,
+                                             "probability": max_prob})
                         break
             else:
+                #find the candidate of the start observer with the highest probability
+                candidate_with_max_prob = None
+                max_prob = 0.0
+                for candidate in candidates:
+                    if candidate.emitted_probability > max_prob:
+                        candidate_with_max_prob = candidate
+                        max_prob = candidate.emitted_probability
+            
                 #add the start vertice to the viterbi path, if we are at the first observation of our trajectory
-                viterbi_path.append({"vertex": transition.start},
-                                    {"probability": transition.start.probability})
+                viterbi_path.append({"vertex": candidate_with_max_prob,
+                                     "probability": max_prob})
             
             #edit the previous observation
             previous_observation = observation
