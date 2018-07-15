@@ -20,16 +20,11 @@ class MapMatcher:
         label.setText("2/3: start search for viterbi path")
         vertices = self.hidden_model.findViterbiPath(max_dist, sigma, my, pb)
         
-        if vertices == -5:
+        if vertices != -5:
+            label.setText("3/3: get network path")
+            layer = self.hidden_model.getPathOnNetwork(vertices, pb)
+        else:
             label.setText("3/3: search distance is too low")
-            return True
-        
-        label.setText("3/3: get network path")
-        layer = self.hidden_model.getPathOnNetwork(vertices, pb)
-        
-        if layer == -1:
-            label.setText("3/3: cannot map trajectory")
-            return True
         
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
