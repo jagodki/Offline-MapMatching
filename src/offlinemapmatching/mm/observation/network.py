@@ -9,15 +9,15 @@ class Network:
     def routing(self, start, end):
         #create director and strategy
         director = QgsVectorLayerDirector(self.vector_layer, -1, '', '', '', 3)
-        #properter = QgsDistanceArcProperter()
-        #director.addProperter(properter)
+        strategy = QgsNetworkDistanceStrategy()
+        director.addStrategy(strategy)
         
         #buildiung the graph
         builder = QgsGraphBuilder(self.vector_layer.sourceCrs())
-        tiedPoints = director.makeGraph(builder, [start, end])
+        tied_points = director.makeGraph(builder, [start, end])
         graph = builder.graph()
-        start_id = graph.findVertex(tiedPoints[0])
-        end_id = graph.findVertex(tiedPoints[1])
+        start_id = graph.findVertex(tied_points[0])
+        end_id = graph.findVertex(tied_points[1])
         
         #start routing
         (tree, cost) = QgsGraphAnalyzer.dijkstra(graph, start_id, 0)
@@ -37,8 +37,10 @@ class Network:
         
         #points == -1, if routing was not possible
         if vertices == -1:
+            print('n.ok')
             return vertices
         else:
+            print('ok')
             distance = 0
             for i, vertice in enumerate(vertices):
                 

@@ -13,6 +13,6 @@ class Observation:
         for feature in network_layer.getFeatures():
             polyline = feature.geometry()
             if self.point.distance(polyline) <= max_distance:
-                candidates.append(Candidate(self.point.nearestPoint(polyline)))
+                candidates.append(Candidate(polyline.nearestPoint(self.point)))
         return candidates
     

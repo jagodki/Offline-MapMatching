@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QProgressBar, QComboBox, QLabel
+from PyQt5.QtWidgets import QProgressBar, QComboBox, QLabel, QApplication
 from qgis.core import *
 from .hidden_states.hidden_model import *
 from .observation.network import *
@@ -15,7 +15,7 @@ class MapMatcher:
     
     def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label):
         label.setText("1/3: set up the hidden model")
-        self.setUp(network_name, trajectory_name, attribute_name)
+        self.setUp(network_name, trajectory_name, attribute_name, pb)
         
         label.setText("2/3: start search for viterbi path")
         vertices = self.hidden_model.findViterbiPath(max_dist, sigma, my, pb)
@@ -82,9 +82,22 @@ class MapMatcher:
                 return layer
         return None
     
-    def setUp(self, line_layer, point_layer, point_attr):
+    def setUp(self, line_layer, point_layer, point_attr, pb):
+        #init progressbar
+        pb.setValue(0)
+        pb.setMaximum(3)
+        QApplication.processEvents()
+        
         self.trajectory = Trajectory(self.getLayer(point_layer), point_attr)
+        pb.setValue(pb.value() + 1)
+        QApplication.processEvents()
+        
         self.network = Network(self.getLayer(line_layer))
+        pb.setValue(pb.value() + 1)
+        QApplication.processEvents()
+        
         self.hidden_model = HiddenModel(self.trajectory, self.network)
+        pb.setValue(pb.value() + 1)
+        QApplication.processEvents()
     
     

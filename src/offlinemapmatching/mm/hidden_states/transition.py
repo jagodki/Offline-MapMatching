@@ -11,15 +11,21 @@ class Transition:
         self.transition_probability = 0.0
     
     def setDirectionProbability(self, start_observation, end_observation):
+        m_observation = 0.0
+        m_candidate = 0.0
+        
         #calculate the slopes using arctan, i.e. we get results between 0 and 180 degrees
-        m_observation = math.degrees(math.atan((end_observation.point.asPoint().y() -
-                                               start_observation.point.asPoint().y()) /
-                                               (end_observation.point.asPoint().x() -
-                                               start_observation.point.asPoint().x()))) + 90
-        m_candidate = math.degrees(math.atan((self.end_candidate.point.asPoint().y() -
-                                             self.start_candidate.point.asPoint().y()) /
-                                             (self.end_candidate.point.asPoint().x() -
-                                             self.start_candidate.point.asPoint().x()))) + 90
+        if (end_observation.point.asPoint().x() - start_observation.point.asPoint().x()) != 0:
+            m_observation = math.degrees(math.atan((end_observation.point.asPoint().y() -
+                                                    start_observation.point.asPoint().y()) /
+                                                   (end_observation.point.asPoint().x() -
+                                                    start_observation.point.asPoint().x()))) + 90
+    
+        if (self.end_candidate.point.asPoint().x() - self.start_candidate.point.asPoint().x()) != 0:
+            m_candidate = math.degrees(math.atan((self.end_candidate.point.asPoint().y() -
+                                                  self.start_candidate.point.asPoint().y()) /
+                                                 (self.end_candidate.point.asPoint().x() -
+                                                  self.start_candidate.point.asPoint().x()))) + 90
         
         #calculate the difference of the slopes
         difference = m_observation - m_candidate

@@ -120,7 +120,6 @@ class HiddenModel:
                 #get all points along the shortest way from the previous to the current vertex
                 points = self.network.routing(vertices[i - 1]["vertex"].point.asPoint(), vertex["vertex"].point.asPoint())
                 if points == -1:
-                    print("test")
                     return points
                 
                 #now create a new line feature and add all the points as vertices to this new line
