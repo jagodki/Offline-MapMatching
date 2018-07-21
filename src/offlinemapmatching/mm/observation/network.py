@@ -8,7 +8,7 @@ class Network:
     
     def routing(self, start, end):
         #create director and strategy
-        director = QgsVectorLayerDirector(self.vector_layer, -1, '', '', '', 3)
+        director = QgsVectorLayerDirector(self.vector_layer, -1, '', '', '', 2)
         strategy = QgsNetworkDistanceStrategy()
         director.addStrategy(strategy)
         
@@ -24,12 +24,28 @@ class Network:
         if tree[end_id] == -1:
             return -1
         else:
-            points = []
+            points = {}
             cur_pos = end_id
+            
             while cur_pos != start_id:
-                points.append(graph.vertex(graph.arc(tree[curPos]).inVertex()).point())
-                cur_pos = graph.arc(tree[cur_pos]).outVertex()
-            return points
+                #extract the indices and points of the current edge
+                from_vertex_id = str(graph.edge(tree[cur_pos]).fromVertex())
+                from_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point()
+                to_vertex_id = str(graph.edge(tree[cur_pos]).toVertex())
+                to_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point()
+                
+                #add the extracted information to the dictionary
+                points.update({from_vertex_id : from_vertex_point})
+                points.update({to_vertex_id : to_vertex_point})
+                
+                #set the cur_pos for the next loop
+                if cur_pos != graph.edge(tree[cur_pos]).toVertex():
+                    cur_pos = graph.edge(tree[cur_pos]).toVertex()
+                else:
+                    cur_pos = graph.edge(tree[cur_pos]).fromVertex()
+        
+            #return the values of the dictionary only
+            return list(points.values())
     
     def distanceOnNetwork(self, start, end):
         #get all vertices from the routing result
@@ -37,16 +53,16 @@ class Network:
         
         #points == -1, if routing was not possible
         if vertices == -1:
-            print('n.ok')
+            print(start)
+            print(end)
             return vertices
         else:
-            print('ok')
             distance = 0
-            for i, vertice in enumerate(vertices):
+            for i, vertex in enumerate(vertices):
                 
                 #get the distance between the current vertice and the next vertice
                 if len(vertices) > (i + 1):
-                    distance = distance + vertice.distance(vertices[i + 1].x(), vertices[i + 1].y())
+                    distance = distance + vertex.distance(vertices[i + 1].x(), vertices[i + 1].y())
                 else:
                     return distance
             return distance

@@ -4,7 +4,6 @@ from ..observation.observation import *
 from .candidate import *
 from .transition import *
 from qgis.core import *
-import psycopg2
 from PyQt5.QtWidgets import QProgressBar, QApplication
 from PyQt5.QtCore import QVariant
 
@@ -45,7 +44,7 @@ class HiddenModel:
                 #create transitions between candidates and last viterbi vertex
                 transitions = []
                 for candidate in candidates:
-                    transitions.append(Transition(last_viterbi_entry["vertex"], candidate))
+                    transitions.append(Transition(last_viterbi_entry['vertex'], candidate))
                 
                 #calculate probabilities of the transitions (direction and length) and totalise them
                 sum_routing_probability = 0.0
@@ -66,17 +65,18 @@ class HiddenModel:
                         transition.direction_probability = transition.direction_probability / sum_direction_probability
                     transition.setTransitionProbability()
                 
-                #find the highest probability (product of previous prob., trans. prob. and em. prob.)
+                #calculate the highest probability (product of previous prob., trans. prob. and em. prob.)
                 max_prob = 0.0
                 for transition in transitions:
-                    max_prob = (last_viterbi_entry["probability"] * transition.transition_probability * transition.end_candidate.emitted_probability)
-
+                    max_prob = (last_viterbi_entry['probability'] * transition.transition_probability * transition.end_candidate.emitted_probability)
+                
+                #find the transition with the highest probability
                 for transition in transitions:
-                    if (last_viterbi_entry["probability"] * transition.transition_probability * transition.end_candidate.emitted_probability) == max_prob:
+                    if (last_viterbi_entry['probability'] * transition.transition_probability * transition.end_candidate.emitted_probability) == max_prob:
                         
                         #add the candidate with the highest prob. product to the viterbi path
-                        viterbi_path.append({"vertex": transition.end_candidate,
-                                             "probability": max_prob})
+                        viterbi_path.append({'vertex': transition.end_candidate,
+                                             'probability': max_prob})
                         break
             else:
                 #find the candidate of the start observer with the highest probability
@@ -88,8 +88,8 @@ class HiddenModel:
                         max_prob = candidate.emitted_probability
             
                 #add the start vertice to the viterbi path, if we are at the first observation of our trajectory
-                viterbi_path.append({"vertex": candidate_with_max_prob,
-                                     "probability": max_prob})
+                viterbi_path.append({'vertex': candidate_with_max_prob,
+                                     'probability': max_prob})
             
             #edit the previous observation
             previous_observation = observation
@@ -100,11 +100,11 @@ class HiddenModel:
     
     def getPathOnNetwork(self, vertices, pb):
         #create a new layer
-        layer = QgsVectorLayer("LineString", "matched trajectory", "memory")
+        layer = QgsVectorLayer('LineString', 'matched trajectory', 'memory')
         layer_data = layer.dataProvider()
-        layer_data.addAttributes([QgsField("id", QVariant.Int),
-                                  QgsField("probability_start_vertex", QVariant.Int),
-                                  QgsField("probability_end_vertex", QVariant.Int)])
+        layer_data.addAttributes([QgsField('id', QVariant.Int),
+                                  QgsField('probability_start_vertex', QVariant.Int),
+                                  QgsField('probability_end_vertex', QVariant.Int)])
         layer.updateFields()
         
         #init progressbar
@@ -118,18 +118,22 @@ class HiddenModel:
             if i != 0:
                 
                 #get all points along the shortest way from the previous to the current vertex
-                points = self.network.routing(vertices[i - 1]["vertex"].point.asPoint(), vertex["vertex"].point.asPoint())
+                points = self.network.routing(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint())
                 if points == -1:
                     return points
                 
-                #now create a new line feature and add all the points as vertices to this new line
+                #now create a new line feature
+                feature = QgsFeature(layer.fields())
+                
+                #create the geometry of the new feature
                 linestring_vertices = []
                 for point in points:
                     linestring_vertices.append(point)
-                feature = QgsFeature()
                 feature.setGeometry(QgsGeometry.fromPolylineXY(linestring_vertices))
-                feature.setAttribute("probability_start_vertex", vertices[i - 1]["probability"])
-                feature.setAttribute("probability_end_vertex", vertex["probability"])
+                
+                #insert the attributes and add the feature to the layer
+                feature.setAttribute('probability_start_vertex', vertices[i - 1]['probability'])
+                feature.setAttribute('probability_end_vertex', vertex['probability'])
                 layer.addFeatures([feature])
             
             pb.setValue(pb.value() + 1)
