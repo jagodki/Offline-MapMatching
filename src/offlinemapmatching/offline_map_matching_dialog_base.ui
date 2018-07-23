@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>595</width>
-    <height>427</height>
+    <height>456</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -109,17 +109,7 @@
        <layout class="QVBoxLayout" name="verticalLayout_5">
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_sigma">
-            <property name="text">
-             <string>Standard Deviation [m]:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_my">
             <property name="text">
              <string>Expected Value [m]:</string>
@@ -129,7 +119,7 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_max">
             <property name="text">
              <string>Maximum Search Distance [m]:</string>
@@ -139,27 +129,54 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_max">
-            <property name="maximum">
-             <double>9900000000.989999771118164</double>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_my">
-            <property name="maximum">
-             <double>9900000000.989999771118164</double>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBox_sigma">
             <property name="maximum">
              <double>9900000000.989999771118164</double>
             </property>
             <property name="value">
              <double>50.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_sigma">
+            <property name="text">
+             <string>Standard Deviation [m]:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_max">
+            <property name="maximum">
+             <double>9900000000.989999771118164</double>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_my">
+            <property name="maximum">
+             <double>9900000000.989999771118164</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_crs">
+            <property name="text">
+             <string>CRS of output layer (EPSG):</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_crs">
+            <property name="placeholderText">
+             <string>e.g. 25833</string>
             </property>
            </widget>
           </item>
@@ -233,11 +250,12 @@
   <tabstop>comboBox_network</tabstop>
   <tabstop>comboBox_trajectory</tabstop>
   <tabstop>comboBox_trajectoryID</tabstop>
+  <tabstop>lineEdit_crs</tabstop>
   <tabstop>doubleSpinBox_sigma</tabstop>
   <tabstop>doubleSpinBox_my</tabstop>
   <tabstop>doubleSpinBox_max</tabstop>
-  <tabstop>textEdit_help</tabstop>
   <tabstop>pushButton_start</tabstop>
+  <tabstop>textEdit_help</tabstop>
  </tabstops>
  <resources/>
  <connections/>

@@ -44,7 +44,15 @@ class HiddenModel:
                 #create transitions between candidates and last viterbi vertex
                 transitions = []
                 for candidate in candidates:
-                    transitions.append(Transition(last_viterbi_entry['vertex'], candidate))
+                    #get coordinates of the last viterbi entry and the current candidate
+                    x_viterbi = last_viterbi_entry['vertex'].point.asPoint().x()
+                    y_viterbi = last_viterbi_entry['vertex'].point.asPoint().y()
+                    x_candidate = candidate.point.asPoint().x()
+                    y_candidate = candidate.point.asPoint().y()
+                    
+                    #just create a new Transition, if the current candidate and the last viterbi entry are different
+                    if x_viterbi != x_candidate and y_viterbi != y_candidate:
+                        transitions.append(Transition(last_viterbi_entry['vertex'], candidate))
                 
                 #calculate probabilities of the transitions (direction and length) and totalise them
                 sum_routing_probability = 0.0
@@ -98,26 +106,27 @@ class HiddenModel:
             
         return viterbi_path
     
-    def getPathOnNetwork(self, vertices, pb):
+    def getPathOnNetwork(self, vertices, pb, crs):
         #create a new layer
-        layer = QgsVectorLayer('LineString', 'matched trajectory', 'memory')
+        layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
+        QgsProject.instance().addMapLayer(layer)
+        layer.startEditing()
         layer_data = layer.dataProvider()
         layer_data.addAttributes([QgsField('id', QVariant.Int),
-                                  QgsField('probability_start_vertex', QVariant.Int),
-                                  QgsField('probability_end_vertex', QVariant.Int)])
+                                  QgsField('probability_start_vertex', QVariant.Double),
+                                  QgsField('probability_end_vertex', QVariant.Double)])
         layer.updateFields()
         
         #init progressbar
         pb.setValue(0)
         pb.setMaximum(len(vertices))
-        
         #iterate over the vertices
         for i, vertex in enumerate(vertices):
             
             #if we are in the first loop, we skip them because we have no previous point to create a routing with start and end
             if i != 0:
                 
-                #get all points along the shortest way from the previous to the current vertex
+                #get all edges of the graph/network along the shortest way from the previous to the current vertex
                 points = self.network.routing(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint())
                 if points == -1:
                     return points
@@ -132,6 +141,7 @@ class HiddenModel:
                 feature.setGeometry(QgsGeometry.fromPolylineXY(linestring_vertices))
                 
                 #insert the attributes and add the feature to the layer
+                feature.setAttribute('id', i)
                 feature.setAttribute('probability_start_vertex', vertices[i - 1]['probability'])
                 feature.setAttribute('probability_end_vertex', vertex['probability'])
                 layer.addFeatures([feature])

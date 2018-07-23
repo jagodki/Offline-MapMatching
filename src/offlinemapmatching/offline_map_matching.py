@@ -229,4 +229,5 @@ class OfflineMapMatching:
                                                self.dlg.doubleSpinBox_sigma.value(),
                                                self.dlg.doubleSpinBox_my.value(),
                                                self.dlg.doubleSpinBox_max.value(),
-                                               self.dlg.label_info)
+                                               self.dlg.label_info,
+                                               self.dlg.lineEdit_crs.text())

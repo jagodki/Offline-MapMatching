@@ -13,7 +13,7 @@ class MapMatcher:
         self.network = None
         self.trajectoy = None
     
-    def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label):
+    def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
         label.setText("1/3: set up the hidden model")
         self.setUp(network_name, trajectory_name, attribute_name, pb)
         
@@ -22,32 +22,19 @@ class MapMatcher:
         
         if vertices == -5:
             label.setText("3/3: search distance is too low")
-            return True
+            return False
         
         label.setText("3/3: get network path")
-        layer = self.hidden_model.getPathOnNetwork(vertices, pb)
+        layer = self.hidden_model.getPathOnNetwork(vertices, pb, "EPSG:" + crs)
         
         if layer == -1:
             label.setText("3/3: cannot map trajectory")
-            return True
+            return False
         
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
         label.setText("finished ^o^")
     
-    def startDijkstraMatching(self, pb, trajectory_name, network_name, sigma, my, host, port, database, user, password, label, crs):
-        label.setText("1/3: set up the hidden model")
-        self.setUp(network_name, trajectory_name, attribute_name)
-        
-        label.setText("2/3: start search for dijkstra path")
-        vertices = self.hidden_model.findDijkstraPath(host, port, database, user, password, crs, pb)
-        
-        label.setText("3/3: get network path")
-        layer = self.hidden_model.getPathOnNetwork(vertices, pb)
-        
-        layer.select([])
-        QgsProject.instance().addMapLayer(layer)
-        label.setText("finished ^o^")
     
     def fillLayerComboBox(self, iface, combobox, geom_type):
         #first clear the combobox

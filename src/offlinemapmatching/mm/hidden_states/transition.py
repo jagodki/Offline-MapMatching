@@ -36,7 +36,7 @@ class Transition:
     def setRoutingProbability(self, network, distance_between_observations):
         distance_on_network = network.distanceOnNetwork(self.start_candidate.point.asPoint(),
                                                         self.end_candidate.point.asPoint())
-        if distance_on_network >= distance_between_observations:
+        if distance_on_network >= distance_between_observations and distance_on_network != 0.0:
             self.routing_probability = distance_between_observations / distance_on_network
         else:
             self.routing_probability = distance_on_network / distance_between_observations

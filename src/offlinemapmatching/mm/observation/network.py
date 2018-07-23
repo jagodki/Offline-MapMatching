@@ -55,6 +55,7 @@ class Network:
         if vertices == -1:
             print(start)
             print(end)
+            print(1)
             return vertices
         else:
             distance = 0
