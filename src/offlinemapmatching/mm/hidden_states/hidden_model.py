@@ -4,8 +4,9 @@ from ..observation.observation import *
 from .candidate import *
 from .transition import *
 from qgis.core import *
+import os
 from PyQt5.QtWidgets import QProgressBar, QApplication
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QVariant, QDir
 
 class HiddenModel:
     
@@ -109,6 +110,14 @@ class HiddenModel:
     def getPathOnNetwork(self, vertices, pb, crs):
         #create a new layer
         layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
+        
+        #load the style
+        dir = os.path.dirname(__file__)
+        filename = os.path.relpath('.../style.qml', dir)
+        layer.loadNamedStyle(QDir.toNativeSeparators(filename))
+        print(filename)
+        
+        #add the layer to the project
         QgsProject.instance().addMapLayer(layer)
         layer.startEditing()
         layer_data = layer.dataProvider()

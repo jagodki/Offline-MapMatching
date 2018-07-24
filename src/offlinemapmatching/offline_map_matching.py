@@ -24,6 +24,9 @@
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
+from qgis.gui import QgsMessageBar
+from qgis.core import QgsMessageLog
+import time, traceback
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -222,12 +225,21 @@ class OfflineMapMatching:
         self.populateComboBox("fields")
     
     def startMapMatching(self):
-        self.map_matcher.startViterbiMatching(self.dlg.progressBar,
-                                               self.dlg.comboBox_trajectory.currentText(),
-                                               self.dlg.comboBox_network.currentText(),
-                                               self.dlg.comboBox_trajectoryID.currentText(),
-                                               self.dlg.doubleSpinBox_sigma.value(),
-                                               self.dlg.doubleSpinBox_my.value(),
-                                               self.dlg.doubleSpinBox_max.value(),
-                                               self.dlg.label_info,
-                                               self.dlg.lineEdit_crs.text())
+        try:
+            start_time = time.time()
+            result = self.map_matcher.startViterbiMatching(
+                          self.dlg.progressBar,
+                          self.dlg.comboBox_trajectory.currentText(),
+                          self.dlg.comboBox_network.currentText(),
+                          self.dlg.comboBox_trajectoryID.currentText(),
+                          self.dlg.doubleSpinBox_sigma.value(),
+                          self.dlg.doubleSpinBox_my.value(),
+                          self.dlg.doubleSpinBox_max.value(),
+                          self.dlg.label_info,
+                          self.dlg.lineEdit_crs.text())
+            if result:
+                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + " sec", level=Qgis.Success, duration=60)
+            
+        except:
+            QgsMessageLog.logMessage(traceback.print_exc(), level=Qgis.Critical)
+            self.iface.messageBar().pushMessage('An error occured. Please look into the log and/or Python console for further information.', level=Qgis.Critical, duration=60)
