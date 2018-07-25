@@ -13,6 +13,19 @@ class HiddenModel:
     def __init__(self, trajectory, network):
         self.trajectory = trajectory
         self.network = network
+        self.candidates_trellis = []
+        self.candidates_parents = {}
+    
+    def createTrellis(self, maximum_distance, sigma, my, pb):
+        #init progressbar
+        pb.setValue(0)
+        pb.setMaximum(len(self.trajectory.observations))
+        
+        #init data structur
+        self.candidates_trellis = []
+        self.candidates_parents = {}
+    
+    
     
     def findViterbiPath(self, maximum_distance, sigma, my, pb):
         #init progressbar
@@ -113,9 +126,11 @@ class HiddenModel:
         
         #load the style
         dir = os.path.dirname(__file__)
-        filename = os.path.relpath('.../style.qml', dir)
-        layer.loadNamedStyle(QDir.toNativeSeparators(filename))
+        filename = os.path.abspath(os.path.join(dir, '../style.qml'))
+        filename = 'Users/Christoph/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/Offline-MapMatching/mm/hidden_states/.../style.qml'
+        test = layer.loadNamedStyle(filename, loadFromLocalDb=False)
         print(filename)
+        print(test)
         
         #add the layer to the project
         QgsProject.instance().addMapLayer(layer)

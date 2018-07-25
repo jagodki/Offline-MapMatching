@@ -25,7 +25,7 @@ from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 from qgis.gui import QgsMessageBar
-from qgis.core import QgsMessageLog
+from qgis.core import *
 import time, traceback
 
 # Initialize Qt resources from file resources.py
@@ -237,9 +237,14 @@ class OfflineMapMatching:
                           self.dlg.doubleSpinBox_max.value(),
                           self.dlg.label_info,
                           self.dlg.lineEdit_crs.text())
-            if result:
-                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + " sec", level=Qgis.Success, duration=60)
             
+            if result == 0:
+                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + " sec", level=Qgis.Success, duration=60)
+            elif result == -1:
+                self.iface.messageBar().pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
+            elif result == -5:
+                self.iface.messageBar().pushMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Warning, duration=60)
+    
         except:
             QgsMessageLog.logMessage(traceback.print_exc(), level=Qgis.Critical)
             self.iface.messageBar().pushMessage('An error occured. Please look into the log and/or Python console for further information.', level=Qgis.Critical, duration=60)

@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QProgressBar, QComboBox, QLabel, QApplication
 from qgis.core import *
-from qgis.gui import QgsMessageBar
 from .hidden_states.hidden_model import *
 from .observation.network import *
 from .observation.trajectory import *
@@ -15,29 +14,33 @@ class MapMatcher:
         self.trajectoy = None
     
     def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
-        label.setText("1/3: set up the hidden model")
+        label.setText('1/3: initialise data structur')
+        QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
         self.setUp(network_name, trajectory_name, attribute_name, pb)
         
-        label.setText("2/3: start search for viterbi path")
+        label.setText('2/3: start search for viterbi path')
+        QgsMessageLog.logMessage('start search for viterbi path', level=Qgis.Info)
         vertices = self.hidden_model.findViterbiPath(max_dist, sigma, my, pb)
         
         if vertices == -5:
-            pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
-            label.setText("3/3: search distance is too low")
-            return False
+            QgsMessageLog.logMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Critical)
+            label.setText('3/3: search distance is too low')
+            return -5
         
-        label.setText("3/3: get network path")
-        layer = self.hidden_model.getPathOnNetwork(vertices, pb, "EPSG:" + crs)
+        label.setText('3/3: get network path')
+        QgsMessageLog.logMessage('get network path', level=Qgis.Info)
+        layer = self.hidden_model.getPathOnNetwork(vertices, pb, 'EPSG:' + crs)
         
         if layer == -1:
-            pushMessage('Routing between the result points does not work.', level=Qgis.Warning, duration=60)
-            label.setText("3/3: cannot map trajectory")
-            return False
+            label.setText('3/3: cannot map trajectory')
+            QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Critical)
+            return -1
         
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
-        label.setText("finished ^o^")
-    
+        label.setText('finished ^o^')
+        QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
+        return 0
     
     def fillLayerComboBox(self, iface, combobox, geom_type):
         #first clear the combobox
