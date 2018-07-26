@@ -36,6 +36,8 @@ class MapMatcher:
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Critical)
             return -1
         
+        self.hidden_model.addLayerToTheMap(layer)
+        
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
         label.setText('finished ^o^')

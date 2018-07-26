@@ -13,19 +13,128 @@ class HiddenModel:
     def __init__(self, trajectory, network):
         self.trajectory = trajectory
         self.network = network
+        self.counter_candidates = 0
         self.candidates_trellis = []
-        self.candidates_parents = {}
+        self.candidates = {}
+        self.candidates_backtracking = {}
     
-    def createTrellis(self, maximum_distance, sigma, my, pb):
+    def createTrellis(self, maximum_distance, pb):
         #init progressbar
         pb.setValue(0)
         pb.setMaximum(len(self.trajectory.observations))
         
         #init data structur
         self.candidates_trellis = []
-        self.candidates_parents = {}
+        self.counter_candidates = 0
+        
+        #iterate over all observations from our trajectory
+        for i, observation in enumeration(self.trajectory.observations):
+            
+            #extract all candidates of the current observation
+            candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
+            if len(candidates) == 0:
+                return -5
+            else:
+                #create the current level of the trellis
+                current_trellis_level = []
+                for candidate in candidates:
+                    current_trellis_level.append({'id' : str(self.counter_candidates),
+                                                  'observation_id' : i,
+                                                  'probability' : 0.0})
+                    self.candidates.update({str(self.counter_candidates) : candidate})
+                    self.counter_candidates += 1
+                
+                #add the current trellis level to the trellis
+                self.candidates_trellis.append(current_trellis_level)
+            
+            #update progressbar
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
+        
+        return 0
+    
+    def createBacktracking(self, sigma, my, pb):
+        #init progressbar
+        pb.setValue(0)
+        pb.setMaximum(len(self.candidates_trellis))
+        
+        #init data structur
+        self.candidates_backtracking = {}
+        
+        #iterate over the trellis
+        for i, current_trellis_level in enumerate(self.candidates_trellis):
+            
+            #get the corresponding observation tu the current trellis level
+            corresponding_observation = self.trajectory.observations[i]
+            
+            #check, whether we are at the first level of the trellis or not
+            for level_entry in current_trellis_level:
+                #set the emittedProbability as overall probability
+                #for the first level, these probabilities are the start probabilities
+                #for each other level, these probabilities will be update later in this function
+                probability = self.candidates.get(level_entry.get('id')).calculateEmittedProbability(corresponding_observation, sigma, my)
+                level_entry.update({'probability' : probability})
+                
+                #insert the current candidate to the backtracking dictionary
+                #no parent for the first level candidates, other candidates will be updated later
+                self.candidates_backtracking.update({level_entry.get('id') : None})
+            
+            #normalise the emitted probabilities, i.e. the sum of all probabilities has to be equal 1
+            self.normaliseEmittedProbabilities(current_trellis_level)
+                
+            #check, whether we are not at the first level of the trellis
+            if i != 0:
+                #get the previous trellis level
+                previous_trellis_level = self.candidates_trellis[i - 1]
+                
+                #iterate over all candidates of the previous level to find the highest probability
+                for previous_entry in previous_trellis_level:
+                    
+                    #init an array to store all transitions starting from the previous_entry to create a right stochastic matrix
+                    transitions = []
+                    
+                    #get the EmittedProbability of the current candidate
+                    current_candidate_emitted_probability = self.candidates.get(level_entry.get('id')).calculateEmittedProbability(corresponding_observation, sigma, my)
+                    
+                    #iterate over the current level to calculate all probabilities
+                    for level_entry in current_trellis_level:
+                        
+                        #get the candidates
+                        current_candidate = self.candidates.get(level_entry.get('id'))
+                        previous_candidate = self.candidates.get(previous_entry.get('id'))
+                        
+                        #get the EmittedProbability of the current candidate
+                        current_candidate_emitted_probability = current_candidate.calculateEmittedProbability(corresponding_observation, sigma, my)
+                        
+                        #just continue, if both candidates do not have the same position
+                        if self.checkPositionsOfTwoCandidates(current_candidate, previous_candidate):
+                            Transition(previous_candidate, current_candidate)
+                            
+        
     
     
+    def checkPositionsOfTwoCandidates(self, candidate_1, candidate_2):
+        #get coordinates of the previous entry and the current candidate
+        x_candidate_1 = candidate_1.point.asPoint().x()
+        y_candidate_1 = candidate_1.point.asPoint().y()
+        x_candidate_2 = candidate_2.point.asPoint().x()
+        y_candidate_2 = candidate_2.point.asPoint().y()
+                        
+        #if points are not equal, return True, otherwise False
+        if x_candidate_1 != x_candidate_2 and y_candidate_1 != y_candidate_2:
+            return True
+        else:
+            return False
+    
+    def normaliseTransitionProbabilities(self, transitions):
+        test = ''
+    
+    def normaliseEmittedProbabilities(self, trellis_level):
+        sum = 0.0
+        for candidate in trellis_level:
+            sum += candidate.get('probability')
+        for candidate in trellis_level:
+            candidate.update({'probability' : candidate.get('probability') / sum})
     
     def findViterbiPath(self, maximum_distance, sigma, my, pb):
         #init progressbar
@@ -120,20 +229,20 @@ class HiddenModel:
             
         return viterbi_path
     
+    def addLayerToTheMap(self, layer):
+        #load the style
+        dir = os.path.dirname(__file__)
+        filename = os.path.abspath(os.path.join(dir, '..', '..', 'style.qml'))
+        test = layer.loadNamedStyle(filename, loadFromLocalDb=False)
+    
+        #add the layer to the map
+        QgsProject.instance().addMapLayer(layer)
+    
     def getPathOnNetwork(self, vertices, pb, crs):
         #create a new layer
         layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
         
-        #load the style
-        dir = os.path.dirname(__file__)
-        filename = os.path.abspath(os.path.join(dir, '../style.qml'))
-        filename = 'Users/Christoph/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/Offline-MapMatching/mm/hidden_states/.../style.qml'
-        test = layer.loadNamedStyle(filename, loadFromLocalDb=False)
-        print(filename)
-        print(test)
-        
         #add the layer to the project
-        QgsProject.instance().addMapLayer(layer)
         layer.startEditing()
         layer_data = layer.dataProvider()
         layer_data.addAttributes([QgsField('id', QVariant.Int),
