@@ -18,7 +18,7 @@ class HiddenModel:
         self.candidates = {}
         self.candidates_backtracking = {}
     
-    def createTrellis(self, maximum_distance, pb):
+    def createTrellis(self, sigma, my, maximum_distance, pb):
         #init progressbar
         pb.setValue(0)
         pb.setMaximum(len(self.trajectory.observations))
@@ -28,7 +28,7 @@ class HiddenModel:
         self.counter_candidates = 0
         
         #iterate over all observations from our trajectory
-        for i, observation in enumeration(self.trajectory.observations):
+        for i, observation in enumerate(self.trajectory.observations):
             
             #extract all candidates of the current observation
             candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
@@ -40,11 +40,15 @@ class HiddenModel:
                 for candidate in candidates:
                     current_trellis_level.append({'id' : str(self.counter_candidates),
                                                   'observation_id' : i,
-                                                  'probability' : 0.0})
+                                                  'emitted_probability' : candidate.calculateEmittedProbability(observation, sigma, my),
+                                                  'transition_probabilities' : {},
+                                                  'transition_probability' : 0.0,
+                                                  'total_probability' : 0.0})
                     self.candidates.update({str(self.counter_candidates) : candidate})
                     self.counter_candidates += 1
                 
-                #add the current trellis level to the trellis
+                #normalise the probabilities and add the current trellis level to the trellis
+                self.normaliseEmittedProbabilities(current_trellis_level)
                 self.candidates_trellis.append(current_trellis_level)
             
             #update progressbar
@@ -53,65 +57,121 @@ class HiddenModel:
         
         return 0
     
-    def createBacktracking(self, sigma, my, pb):
+    def getTrellisEntryById(self, id, level):
+        for entry in self.candidates_trellis[level]:
+            if entry.get('id') == id:
+                return entry
+    
+    def createBacktracking(self, pb):
         #init progressbar
         pb.setValue(0)
         pb.setMaximum(len(self.candidates_trellis))
+        QApplication.processEvents()
         
-        #init data structur
-        self.candidates_backtracking = {}
-        
-        #iterate over the trellis
-        for i, current_trellis_level in enumerate(self.candidates_trellis):
+        for i, trellis_level in enumerate(self.candidates_trellis):
             
-            #get the corresponding observation tu the current trellis level
-            corresponding_observation = self.trajectory.observations[i]
-            
-            #check, whether we are at the first level of the trellis or not
-            for level_entry in current_trellis_level:
-                #set the emittedProbability as overall probability
-                #for the first level, these probabilities are the start probabilities
-                #for each other level, these probabilities will be update later in this function
-                probability = self.candidates.get(level_entry.get('id')).calculateEmittedProbability(corresponding_observation, sigma, my)
-                level_entry.update({'probability' : probability})
-                
-                #insert the current candidate to the backtracking dictionary
-                #no parent for the first level candidates, other candidates will be updated later
-                self.candidates_backtracking.update({level_entry.get('id') : None})
-            
-            #normalise the emitted probabilities, i.e. the sum of all probabilities has to be equal 1
-            self.normaliseEmittedProbabilities(current_trellis_level)
-                
-            #check, whether we are not at the first level of the trellis
+            #the candidates of the first observation have no parent
             if i != 0:
-                #get the previous trellis level
-                previous_trellis_level = self.candidates_trellis[i - 1]
+                for entry in trellis_level:
+                    
+                    #get all transition probabilities of the current entry and iterate over them to find the highest total probability
+                    transition_probabilities = entry.get('transition_probabilities')
+                    for key in transition_probabilities:
+                        current_total_probability = transition_probabilities.get(key) * entry.get('emitted_probability') * self.getTrellisEntryById(key, i - 1).get('total_probability')
+                        if current_total_probability > entry.get('total_probability'):
+                            entry.update({'total_probability' : current_total_probability})
+                            entry.update({'transition_probability' : transition_probabilities.get(key)})
+                            self.candidates_backtracking = {entry.get('id') : key}
+            
+            #update progressbar
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
+        
+        return 0
+    
+    def findViterbiPath(self):
+        #init an array to store all candidates of the most likely path
+        viterbi_path = []
+        
+        #find the highest total probability in the last trellis level
+        highest_prob = 0.0
+        id = None
+        trellis_counter = len(self.candidates_trellis) - 1
+        last_trellis_level = self.candidates_trellis[trellis_counter]
+        for entry in last_trellis_level:
+            if entry.get('total_probability') > highest_prob:
+                highest_prob = entry.get('total_probability')
+                id = entry.get('id')
+        
+        #add the last vertex of the path
+        viterbi_path.insert(0, {'vertex': self.candidates.get(id),
+                                'total_probability': highest_prob,
+                                'emitted_probability': self.getTrellisEntryById(id, trellis_counter).get('emitted_probability'),
+                                'transition_probability': self.getTrellisEntryById(id, trellis_counter).get('transition_probability'),
+                                'observation_id': trellis_counter})
+        
+        #now find all parents of this vertex/candidate
+        trellis_counter -= 1
+        current_id = self.candidates_backtracking.get(id)
+        while(current_id is not None and trellis_counter < 0):
+            searched_candidate = self.getTrellisEntryById(current_id, trellis_counter)
+            viterbi_path.insert(0, {'vertex': self.candidates.get(current_id),
+                                    'total_probability': searched_candidate.get('total_probability'),
+                                    'emitted_probability': searched_candidate.get('emitted_probability'),
+                                    'transition_probability': searched_candidate.get('transition_probability'),
+                                    'observation_id': trellis_counter})
+            current_id = self.candidates_backtracking.get(current_id)
+            trellis_counter -= 1
+        
+        return viterbi_path
+    
+    def setTransitionProbabilities(self, pb):
+        #init progressbar
+        pb.setValue(0)
+        pb.setMaximum(len(self.trajectory.observations))
+        QApplication.processEvents()
+        
+        for i, observation in enumerate(self.trajectory.observations):
+            
+            #skip the first observation, because first observation has no parent
+            if i != 0:
                 
-                #iterate over all candidates of the previous level to find the highest probability
+                #get the current and previous trellis level
+                previous_trellis_level = self.candidates_trellis[i - 1]
+                current_trellis_level = self.candidates_trellis[i]
+                
                 for previous_entry in previous_trellis_level:
                     
-                    #init an array to store all transitions starting from the previous_entry to create a right stochastic matrix
-                    transitions = []
+                    #init a variable to store the sum of transition probabilities starting from the previous_entry
+                    #to create a right stochastic matrix
+                    sum_prob = 0.0
                     
-                    #get the EmittedProbability of the current candidate
-                    current_candidate_emitted_probability = self.candidates.get(level_entry.get('id')).calculateEmittedProbability(corresponding_observation, sigma, my)
-                    
-                    #iterate over the current level to calculate all probabilities
-                    for level_entry in current_trellis_level:
+                    for current_entry in current_trellis_level:
                         
                         #get the candidates
-                        current_candidate = self.candidates.get(level_entry.get('id'))
+                        current_candidate = self.candidates.get(current_entry.get('id'))
                         previous_candidate = self.candidates.get(previous_entry.get('id'))
                         
-                        #get the EmittedProbability of the current candidate
-                        current_candidate_emitted_probability = current_candidate.calculateEmittedProbability(corresponding_observation, sigma, my)
-                        
-                        #just continue, if both candidates do not have the same position
+                        #just continue, if both candidates do not have the same position, otherwise probability is equal zero
                         if self.checkPositionsOfTwoCandidates(current_candidate, previous_candidate):
-                            Transition(previous_candidate, current_candidate)
+                            transition = Transition(previous_candidate, current_candidate)
                             
-        
-    
+                            #calculate the probabilities of the transition
+                            transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
+                            transition.setRoutingProbability(self.network, observation.point.distance(self.trajectory.observations[i - 1].point))
+                            transition.setTransitionProbability()
+                            
+                            #insert the probability into the trellis and sum up them
+                            sum_prob += transition.transition_probability
+                            current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
+                        
+                    #now normalise the probabilities of all transitions starting from the previous_entry
+                    self.normaliseTransitionProbabilities(current_trellis_level, previous_entry.get('id'), sum_prob)
+                
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
+            
+        return 0
     
     def checkPositionsOfTwoCandidates(self, candidate_1, candidate_2):
         #get coordinates of the previous entry and the current candidate
@@ -126,108 +186,36 @@ class HiddenModel:
         else:
             return False
     
-    def normaliseTransitionProbabilities(self, transitions):
-        test = ''
+    def setStartingProbabilities(self, pb):
+        first_tellis_level = self.candidates_trellis[0]
+        
+        #init progressbar
+        pb.setValue(0)
+        pb.setMaximum(len(first_tellis_level))
+        
+        for entry in first_tellis_level:
+            entry.update({'total_probability' : entry.get('emitted_probability')})
+            self.candidates_backtracking.update({entry.get('id') : None})
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
+        
+        return 0
+    
+    def normaliseTransitionProbabilities(self, trellis_level, id_of_starting_point, sum_of_probabilities):
+        for entry in trellis_level:
+            current_transition_probability = entry.get('transition_probabilities').get(id_of_starting_point)
+            if sum_of_probabilities != 0  and current_transition_probability is not None:
+                normalised_probability = current_transition_probability / sum_of_probabilities
+                entry.get('transition_probabilities').update({id_of_starting_point : normalised_probability})
     
     def normaliseEmittedProbabilities(self, trellis_level):
         sum = 0.0
         for candidate in trellis_level:
-            sum += candidate.get('probability')
+            if candidate.get('emitted_probability') is not None:
+                sum += candidate.get('emitted_probability')
         for candidate in trellis_level:
-            candidate.update({'probability' : candidate.get('probability') / sum})
-    
-    def findViterbiPath(self, maximum_distance, sigma, my, pb):
-        #init progressbar
-        pb.setValue(0)
-        pb.setMaximum(len(self.trajectory.observations))
-        
-        #init an empty viterbi path to store candidates
-        viterbi_path = []
-        
-        #init the previous observation
-        previous_observation = None
-        
-        #iterate over all observations from our trajectory
-        for observation in self.trajectory.observations:
-            
-            #extract all candidates for the current observation
-            candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
-            if len(candidates) == 0:
-                return -5
-            
-            #calculate the probabilities for all candidates to be emitted by the current observation (and vice versa)
-            for candidate in candidates:
-                candidate.calculateEmittedProbability(observation, sigma, my)
-            
-            #check whether we have the starting observation or not
-            if previous_observation is not None and len(viterbi_path) > 0:
-                #get the last entry of the viterbi path
-                last_viterbi_entry = viterbi_path[len(viterbi_path) - 1]
-                
-                #create transitions between candidates and last viterbi vertex
-                transitions = []
-                for candidate in candidates:
-                    #get coordinates of the last viterbi entry and the current candidate
-                    x_viterbi = last_viterbi_entry['vertex'].point.asPoint().x()
-                    y_viterbi = last_viterbi_entry['vertex'].point.asPoint().y()
-                    x_candidate = candidate.point.asPoint().x()
-                    y_candidate = candidate.point.asPoint().y()
-                    
-                    #just create a new Transition, if the current candidate and the last viterbi entry are different
-                    if x_viterbi != x_candidate and y_viterbi != y_candidate:
-                        transitions.append(Transition(last_viterbi_entry['vertex'], candidate))
-                
-                #calculate probabilities of the transitions (direction and length) and totalise them
-                sum_routing_probability = 0.0
-                sum_direction_probability = 0.0
-                for transition in transitions:
-                    transition.setRoutingProbability(self.network, observation.point.distance(previous_observation.point))
-                    transition.setDirectionProbability(previous_observation, observation)
-                    
-                    #totalise
-                    sum_routing_probability += transition.routing_probability
-                    sum_direction_probability += transition.direction_probability
-                
-                #normalize the probabilities of the transitions, i.e. sum of probabilities over all transitions is equal 1
-                for transition in transitions:
-                    if sum_routing_probability != 0.0:
-                        transition.routing_probability = transition.routing_probability / sum_routing_probability
-                    if sum_direction_probability != 0.0:
-                        transition.direction_probability = transition.direction_probability / sum_direction_probability
-                    transition.setTransitionProbability()
-                
-                #calculate the highest probability (product of previous prob., trans. prob. and em. prob.)
-                max_prob = 0.0
-                for transition in transitions:
-                    max_prob = (last_viterbi_entry['probability'] * transition.transition_probability * transition.end_candidate.emitted_probability)
-                
-                #find the transition with the highest probability
-                for transition in transitions:
-                    if (last_viterbi_entry['probability'] * transition.transition_probability * transition.end_candidate.emitted_probability) == max_prob:
-                        
-                        #add the candidate with the highest prob. product to the viterbi path
-                        viterbi_path.append({'vertex': transition.end_candidate,
-                                             'probability': max_prob})
-                        break
-            else:
-                #find the candidate of the start observer with the highest probability
-                candidate_with_max_prob = None
-                max_prob = 0.0
-                for candidate in candidates:
-                    if candidate.emitted_probability > max_prob:
-                        candidate_with_max_prob = candidate
-                        max_prob = candidate.emitted_probability
-            
-                #add the start vertice to the viterbi path, if we are at the first observation of our trajectory
-                viterbi_path.append({'vertex': candidate_with_max_prob,
-                                     'probability': max_prob})
-            
-            #edit the previous observation
-            previous_observation = observation
-            pb.setValue(pb.value() + 1)
-            QApplication.processEvents()
-            
-        return viterbi_path
+            if sum != 0:
+                candidate.update({'emitted_probability' : candidate.get('emitted_probability') / sum})
     
     def addLayerToTheMap(self, layer):
         #load the style
@@ -246,8 +234,14 @@ class HiddenModel:
         layer.startEditing()
         layer_data = layer.dataProvider()
         layer_data.addAttributes([QgsField('id', QVariant.Int),
-                                  QgsField('probability_start_vertex', QVariant.Double),
-                                  QgsField('probability_end_vertex', QVariant.Double)])
+                                  QgsField('total_probability_start', QVariant.Double),
+                                  QgsField('total_probability_end', QVariant.Double),
+                                  QgsField('emitted_probability_start', QVariant.Double),
+                                  QgsField('emitted_probability_end', QVariant.Double),
+                                  QgsField('transition_probability_start', QVariant.Double),
+                                  QgsField('transition_probability_end', QVariant.Double),
+                                  QgsField('observation_id_start', QVariant.Int),
+                                  QgsField('observation_id_end', QVariant.Int)])
         layer.updateFields()
         
         #init progressbar
@@ -275,8 +269,14 @@ class HiddenModel:
                 
                 #insert the attributes and add the feature to the layer
                 feature.setAttribute('id', i)
-                feature.setAttribute('probability_start_vertex', vertices[i - 1]['probability'])
-                feature.setAttribute('probability_end_vertex', vertex['probability'])
+                feature.setAttribute('total_probability_start', vertices[i - 1]['total_probability'])
+                feature.setAttribute('total_probability_end', vertex['total_probability'])
+                feature.setAttribute('emitted_probability_start', vertices[i - 1]['emitted_probability'])
+                feature.setAttribute('emitted_probability_end', vertex['emitted_probability'])
+                feature.setAttribute('transition_probability_start', vertices[i - 1]['transition_probability'])
+                feature.setAttribute('transition_probability_end', vertex['transition_probability'])
+                feature.setAttribute('observation_id_start', vertices[i - 1]['observation_id'])
+                feature.setAttribute('observation_id_end', vertex['observation_id'])
                 layer.addFeatures([feature])
             
             pb.setValue(pb.value() + 1)

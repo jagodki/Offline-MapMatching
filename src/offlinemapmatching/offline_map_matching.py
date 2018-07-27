@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 /***************************************************************************
  OfflineMapMatching
                                  A QGIS plugin
@@ -20,7 +20,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-"""
+'''
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
@@ -39,16 +39,16 @@ from .mm.map_matcher import MapMatcher
 
 
 class OfflineMapMatching:
-    """QGIS Plugin Implementation."""
+    '''QGIS Plugin Implementation.'''
 
     def __init__(self, iface):
-        """Constructor.
+        '''Constructor.
 
         :param iface: An interface instance that will be passed to this class
             which provides the hook by which you can manipulate the QGIS
             application at run time.
         :type iface: QgsInterface
-        """
+        '''
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -86,7 +86,7 @@ class OfflineMapMatching:
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
-        """Get the translation for a string using Qt translation API.
+        '''Get the translation for a string using Qt translation API.
 
         We implement this ourselves since we do not inherit QObject.
 
@@ -95,7 +95,7 @@ class OfflineMapMatching:
 
         :returns: Translated version of message.
         :rtype: QString
-        """
+        '''
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
         return QCoreApplication.translate('OfflineMapMatching', message)
 
@@ -111,7 +111,7 @@ class OfflineMapMatching:
         status_tip=None,
         whats_this=None,
         parent=None):
-        """Add a toolbar icon to the toolbar.
+        '''Add a toolbar icon to the toolbar.
 
         :param icon_path: Path to the icon for this action. Can be a resource
             path (e.g. ':/plugins/foo/bar.png') or a normal file system path.
@@ -148,7 +148,7 @@ class OfflineMapMatching:
         :returns: The action that was created. Note that the action is also
             added to self.actions list.
         :rtype: QAction
-        """
+        '''
 
         icon = QIcon(icon_path)
         action = QAction(icon, text, parent)
@@ -174,7 +174,7 @@ class OfflineMapMatching:
         return action
 
     def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
+        '''Create the menu entries and toolbar icons inside the QGIS GUI.'''
 
         icon_path = ':/plugins/offline_map_matching/icon.png'
         self.add_action(
@@ -185,7 +185,7 @@ class OfflineMapMatching:
 
 
     def unload(self):
-        """Removes the plugin menu item and icon from QGIS GUI."""
+        '''Removes the plugin menu item and icon from QGIS GUI.'''
         for action in self.actions:
             self.iface.removePluginVectorMenu(
                 self.tr(u'&Offline-MapMatching'),
@@ -196,11 +196,11 @@ class OfflineMapMatching:
 
 
     def run(self):
-        """Run method that performs all the real work"""
+        '''Run method that performs all the real work'''
         #populate the comboboxes with the available layers
-        self.populateComboBox("network")
-        self.populateComboBox("trajectory")
-        self.populateComboBox("fields")
+        self.populateComboBox('network')
+        self.populateComboBox('trajectory')
+        self.populateComboBox('fields')
         
         # show the dialog
         self.dlg.show()
@@ -213,16 +213,16 @@ class OfflineMapMatching:
             #pass
     
     def populateComboBox(self, type):
-        """Populate the given combobox."""
-        if type == "network":
-            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_network, "LINESTRING")
-        elif type == "trajectory":
-            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_trajectory, "POINT")
-        elif type == "fields":
+        '''Populate the given combobox.'''
+        if type == 'network':
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_network, 'LINESTRING')
+        elif type == 'trajectory':
+            self.map_matcher.fillLayerComboBox(self.iface, self.dlg.comboBox_trajectory, 'POINT')
+        elif type == 'fields':
             self.map_matcher.fillAttributeComboBox(self.dlg.comboBox_trajectoryID, self.dlg.comboBox_trajectory.currentText())
 
     def startPopulateFieldsComboBox(self):
-        self.populateComboBox("fields")
+        self.populateComboBox('fields')
     
     def startMapMatching(self):
         try:
@@ -239,9 +239,11 @@ class OfflineMapMatching:
                           self.dlg.lineEdit_crs.text())
             
             if result == 0:
-                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + " sec", level=Qgis.Success, duration=60)
+                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + ' sec', level=Qgis.Success, duration=60)
             elif result == -1:
                 self.iface.messageBar().pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
+            elif result == -3:
+                self.iface.messageBar().pushMessage('Something went wrong with the hidden markow model. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
             elif result == -5:
                 self.iface.messageBar().pushMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Warning, duration=60)
     
