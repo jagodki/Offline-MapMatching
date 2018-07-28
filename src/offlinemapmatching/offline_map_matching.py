@@ -225,6 +225,10 @@ class OfflineMapMatching:
         self.populateComboBox('fields')
     
     def startMapMatching(self):
+        self.dlg.groupBox_data.setEnabled(False)
+        self.dlg.groupBox_settings.setEnabled(False)
+        self.dlg.pushButton_start.setEnabled(False)
+        
         try:
             start_time = time.time()
             result = self.map_matcher.startViterbiMatching(
@@ -250,3 +254,8 @@ class OfflineMapMatching:
         except:
             QgsMessageLog.logMessage(traceback.print_exc(), level=Qgis.Critical)
             self.iface.messageBar().pushMessage('An error occured. Please look into the log and/or Python console for further information.', level=Qgis.Critical, duration=60)
+        
+        
+        self.dlg.groupBox_data.setEnabled(True)
+        self.dlg.groupBox_settings.setEnabled(True)
+        self.dlg.pushButton_start.setEnabled(True)

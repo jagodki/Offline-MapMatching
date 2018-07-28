@@ -25,6 +25,7 @@ class HiddenModel:
         
         #init data structur
         self.candidates_trellis = []
+        self.candidates = {}
         self.counter_candidates = 0
         
         #iterate over all observations from our trajectory
@@ -38,9 +39,10 @@ class HiddenModel:
                 #create the current level of the trellis
                 current_trellis_level = []
                 for candidate in candidates:
+                    candidate.calculateEmittedProbability(observation, sigma, my)
                     current_trellis_level.append({'id' : str(self.counter_candidates),
                                                   'observation_id' : i,
-                                                  'emitted_probability' : candidate.calculateEmittedProbability(observation, sigma, my),
+                                                  'emitted_probability' : candidate.emitted_probability,
                                                   'transition_probabilities' : {},
                                                   'transition_probability' : 0.0,
                                                   'total_probability' : 0.0})
@@ -48,7 +50,7 @@ class HiddenModel:
                     self.counter_candidates += 1
                 
                 #normalise the probabilities and add the current trellis level to the trellis
-                self.normaliseEmittedProbabilities(current_trellis_level)
+                #self.normaliseEmittedProbabilities(current_trellis_level)
                 self.candidates_trellis.append(current_trellis_level)
             
             #update progressbar
@@ -68,6 +70,8 @@ class HiddenModel:
         pb.setMaximum(len(self.candidates_trellis))
         QApplication.processEvents()
         
+        self.candidates_backtracking = {}
+        
         for i, trellis_level in enumerate(self.candidates_trellis):
             
             #the candidates of the first observation have no parent
@@ -81,7 +85,7 @@ class HiddenModel:
                         if current_total_probability > entry.get('total_probability'):
                             entry.update({'total_probability' : current_total_probability})
                             entry.update({'transition_probability' : transition_probabilities.get(key)})
-                            self.candidates_backtracking = {entry.get('id') : key}
+                            self.candidates_backtracking.update({entry.get('id') : key})
             
             #update progressbar
             pb.setValue(pb.value() + 1)
@@ -113,7 +117,7 @@ class HiddenModel:
         #now find all parents of this vertex/candidate
         trellis_counter -= 1
         current_id = self.candidates_backtracking.get(id)
-        while(current_id is not None and trellis_counter < 0):
+        while(current_id is not None and trellis_counter >= 0):
             searched_candidate = self.getTrellisEntryById(current_id, trellis_counter)
             viterbi_path.insert(0, {'vertex': self.candidates.get(current_id),
                                     'total_probability': searched_candidate.get('total_probability'),
@@ -143,7 +147,7 @@ class HiddenModel:
                 for previous_entry in previous_trellis_level:
                     
                     #init a variable to store the sum of transition probabilities starting from the previous_entry
-                    #to create a right stochastic matrix
+                    #to create a right stochastic matrix (that's not right, normalisation is commended!)
                     sum_prob = 0.0
                     
                     for current_entry in current_trellis_level:
@@ -166,7 +170,7 @@ class HiddenModel:
                             current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
                         
                     #now normalise the probabilities of all transitions starting from the previous_entry
-                    self.normaliseTransitionProbabilities(current_trellis_level, previous_entry.get('id'), sum_prob)
+                    #self.normaliseTransitionProbabilities(current_trellis_level, previous_entry.get('id'), sum_prob)
                 
             pb.setValue(pb.value() + 1)
             QApplication.processEvents()

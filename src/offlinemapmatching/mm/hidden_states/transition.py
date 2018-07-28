@@ -28,9 +28,9 @@ class Transition:
                                                   self.start_candidate.point.asPoint().x()))) + 90
         
         #calculate the difference of the slopes
-        difference = m_observation - m_candidate
+        difference = abs(m_observation - m_candidate)
         
-        #normalization of the difference
+        #normalisation of the difference
         self.direction_probability = (180 - difference) / 180
     
     def setRoutingProbability(self, network, distance_between_observations):
