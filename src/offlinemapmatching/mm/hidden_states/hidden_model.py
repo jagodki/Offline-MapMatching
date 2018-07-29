@@ -259,6 +259,7 @@ class HiddenModel:
                 
                 #get all edges of the graph/network along the shortest way from the previous to the current vertex
                 points = self.network.routing(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint())
+                
                 if points == -1:
                     return points
                 
@@ -266,10 +267,7 @@ class HiddenModel:
                 feature = QgsFeature(layer.fields())
                 
                 #create the geometry of the new feature
-                linestring_vertices = []
-                for point in points:
-                    linestring_vertices.append(point)
-                feature.setGeometry(QgsGeometry.fromPolylineXY(linestring_vertices))
+                feature.setGeometry(QgsGeometry.fromPolylineXY(points))
                 
                 #insert the attributes and add the feature to the layer
                 feature.setAttribute('id', i)

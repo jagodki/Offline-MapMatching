@@ -44,8 +44,13 @@ class Network:
                 else:
                     cur_pos = graph.edge(tree[cur_pos]).fromVertex()
         
+            #switch the first two points of the dictionary if necessary
+            list_of_vertices = list(points.values())
+            if end.x() == list_of_vertices[1].x() and end.y() == list_of_vertices[1].y():
+                list_of_vertices.insert(0, list_of_vertices.pop(1))
+            
             #return the values of the dictionary only
-            return list(points.values())
+            return list_of_vertices
     
     def distanceOnNetwork(self, start, end):
         #get all vertices from the routing result
