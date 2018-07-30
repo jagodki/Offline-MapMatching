@@ -1,0 +1,46 @@
+<html>
+    <body>
+        <h2><font face="helvetica, arial">Offline-MapMatching</font></h2>
+        <h4><font face="helvetica, arial">Network-Layer:</font></h4>
+        <p><font size=3 face="helvetica, arial">The combobox shows all visible layers of the
+        current QGIS project with the geometry type LINESTRING. It is recommended, that
+        this layer should be a clean graph following a node-edge-model, i.e. different lines
+        should only touch other lines, never cross them. You can get souch a clean graph e.g.
+        by running the PostGIS function "CreateTopology".</font></p>
+        <h4><font face="helvetica, arial">Trajectory-Layer:</font></h4>
+        <p><font size=3 face="helvetica, arial">The combobox shows all visible layers of the
+        current QGIS project with the geometry type POINT.</font></p>
+        <h4><font face="helvetica, arial">Trajectory-ID:</font></h4>
+        <p><font size=3 face="helvetica, arial">The combobox shows all fields of the chosen trajectory layer.
+        The selected field will be added to the result features.</font></p>
+        <h4><font face="helvetica, arial">CRS of output layer (EPSG):</font></h4>
+        <p><font size=3 face="helvetica, arial">Insert the EPSG code, which should be used for the result layer.
+        It is recommended to insert the CRS of the network and trajectory layer (both layer should have the same CRS).
+        It is also recommended to use a metric CRS.</font></p>
+        <h4><font face="helvetica, arial">Standard Deviation [m]:</font></h4>
+        <p><font size=3 face="helvetica, arial">The standard deviation of the distance between the positions from the
+        trajectory and their possible positions on the network. Go to the
+        <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for further information
+        about this setting.</font></p>
+        <h4><font face="helvetica, arial">Expected Value [m]:</font></h4>
+        <p><font size=3 face="helvetica, arial">The expected distance between the positions from the
+        trajectory and their possible positions on the network. It is recommended to choose the value 0, i.e.
+        ideally, the trajectory points already represent the correct positions.</font></p>
+        <h4><font face="helvetica, arial">Maximum Search Distance [m]:</font></h4>
+        <p><font size=3 face="helvetica, arial">The maximum distance to find points on the network for each trajectory point.
+        It is madatory, that this value is greater oder equal than the highest shortest distance between each trajectory point
+        and the whole network. This setting has a big influence on the computing time. Go to the
+        <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for further information
+        about this setting.</font></p>
+        <hr>
+        <p><font size=3 face="helvetica, arial"><h4>The plugin runs the following tasks:</h4>
+        read the input layers<br><br>
+        create a HMM-like data structur<br><br>
+        calculate candidate points for each trajectory point using the maximum search distance and store them in a trellis<br><br>
+        calculate the probability for each candidate point to be emitted by the correpsonding trajectory point<br><br>
+        create transitions between candidates of neighboured trellis levels<br><br>
+        calculate the similarity of the transitions compared to the trajectory points<br><br>
+        find the best candidates using Viterbi algorithm<br><br>
+        create a layer of linestrings using this candidates</font></p>
+    </body>
+</html>

@@ -22,7 +22,7 @@
  ***************************************************************************/
 '''
 from PyQt5.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import QAction
 from qgis.gui import QgsMessageBar
 from qgis.core import *
@@ -76,6 +76,14 @@ class OfflineMapMatching:
         # TODO: We are going to let the user set this up in a future iteration
         self.toolbar = self.iface.addToolBar(u'OfflineMapMatching')
         self.toolbar.setObjectName(u'OfflineMapMatching')
+        
+        #add help-document to the GUI
+        file = os.path.join(os.path.dirname(__file__),'help.html')
+        if os.path.exists(file):
+            with open(file) as helpf:
+                help = helpf.read()
+                self.dlg.textEdit_help.insertHtml(help)
+                self.dlg.textEdit_help.moveCursor(QTextCursor.Start)
         
         #create additional instance vars
         self.map_matcher = MapMatcher()
