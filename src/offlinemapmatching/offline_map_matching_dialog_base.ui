@@ -236,8 +236,11 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTextEdit" name="textEdit_help">
+      <widget class="QTextBrowser" name="textBrowser_help">
        <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="openExternalLinks">
         <bool>true</bool>
        </property>
       </widget>
@@ -255,7 +258,7 @@
   <tabstop>doubleSpinBox_my</tabstop>
   <tabstop>doubleSpinBox_max</tabstop>
   <tabstop>pushButton_start</tabstop>
-  <tabstop>textEdit_help</tabstop>
+  <tabstop>textBrowser_help</tabstop>
  </tabstops>
  <resources/>
  <connections/>

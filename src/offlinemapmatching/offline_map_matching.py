@@ -82,8 +82,8 @@ class OfflineMapMatching:
         if os.path.exists(file):
             with open(file) as helpf:
                 help = helpf.read()
-                self.dlg.textEdit_help.insertHtml(help)
-                self.dlg.textEdit_help.moveCursor(QTextCursor.Start)
+                self.dlg.textBrowser_help.insertHtml(help)
+                self.dlg.textBrowser_help.moveCursor(QTextCursor.Start)
         
         #create additional instance vars
         self.map_matcher = MapMatcher()
