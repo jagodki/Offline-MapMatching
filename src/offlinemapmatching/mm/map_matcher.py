@@ -26,7 +26,7 @@ class MapMatcher:
         if check_results != 0:
             label.setText('cannot create candidate trellis')
             QgsMessageLog.logMessage('cannot create candidate trellis', level=Qgis.Info)
-            return -3
+            return -1
         
         label.setText('calculate starting probabilities')
         QgsMessageLog.logMessage('calculate starting probabilities', level=Qgis.Info)
@@ -58,10 +58,10 @@ class MapMatcher:
         label.setText('get most likely path')
         QgsMessageLog.logMessage('get most likely path', level=Qgis.Info)
         vertices = self.hidden_model.findViterbiPath()
-        if vertices == -5:
-            QgsMessageLog.logMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Critical)
-            label.setText('search distance is too low')
-            return -5
+        if len(vertices) == 0:
+            QgsMessageLog.logMessage('Cannot get a most likely path. Try to change settings.', level=Qgis.Critical)
+            label.setText('cannot get path')
+            return -3
         
         label.setText('get network path')
         QgsMessageLog.logMessage('get network path', level=Qgis.Info)
@@ -69,7 +69,7 @@ class MapMatcher:
         if layer == -1:
             label.setText('cannot map trajectory')
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
-            return -1
+            return -5
         
         self.hidden_model.addLayerToTheMap(layer)
         

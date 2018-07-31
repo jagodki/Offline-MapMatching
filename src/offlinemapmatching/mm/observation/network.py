@@ -58,9 +58,6 @@ class Network:
         
         #points == -1, if routing was not possible
         if vertices == -1:
-            print(start)
-            print(end)
-            print(1)
             return vertices
         else:
             distance = 0
