@@ -20,12 +20,12 @@ class MapMatcher:
         QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
         self.setUp(network_name, trajectory_name, attribute_name, pb)
         
-        label.setText('create candidate trellis')
-        QgsMessageLog.logMessage('create candidate trellis', level=Qgis.Info)
-        check_results = self.hidden_model.createTrellis(sigma, my, max_dist, pb)
+        label.setText('create candidate graph')
+        QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
+        check_results = self.hidden_model.createGraph(sigma, my, max_dist, pb)
         if check_results != 0:
-            label.setText('cannot create candidate trellis')
-            QgsMessageLog.logMessage('cannot create candidate trellis', level=Qgis.Info)
+            label.setText('cannot create candidate graph')
+            QgsMessageLog.logMessage('cannot create candidate graph', level=Qgis.Info)
             return -1
         
         label.setText('calculate starting probabilities')

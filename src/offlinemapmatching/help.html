@@ -35,12 +35,13 @@
         <hr>
         <p><font size=3 face="helvetica, arial"><h4>The plugin runs the following tasks:</h4>
         read the input layers<br><br>
-        create a HMM-like data structur<br><br>
-        calculate candidate points for each trajectory point using the maximum search distance and store them in a trellis<br><br>
+        calculate candidate points for each trajectory point using the maximum search distance and create a graph of candidates<br><br>
         calculate the probability for each candidate point to be emitted by the correpsonding trajectory point<br><br>
-        create transitions between candidates of neighboured trellis levels<br><br>
         calculate the similarity of the transitions compared to the trajectory points<br><br>
         find the best candidates using Viterbi algorithm<br><br>
         create a layer of linestrings using this candidates</font></p>
+		<hr>
+		<p><font size=3 face="helvetica, arial">A detailed description about the algorithm and the settings are provided
+		in the <a href="https://github.com/jagodki/Offline-MapMatching">README document</a> of the repository on GitHub.</font></p>
     </body>
 </html>

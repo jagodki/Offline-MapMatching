@@ -14,17 +14,17 @@ class HiddenModel:
         self.trajectory = trajectory
         self.network = network
         self.counter_candidates = 0
-        self.candidates_trellis = []
+        self.candidate_graph = []
         self.candidates = {}
         self.candidates_backtracking = {}
     
-    def createTrellis(self, sigma, my, maximum_distance, pb):
+    def createGraph(self, sigma, my, maximum_distance, pb):
         #init progressbar
         pb.setValue(0)
         pb.setMaximum(len(self.trajectory.observations))
         
         #init data structur
-        self.candidates_trellis = []
+        self.candidate_graph = []
         self.candidates = {}
         self.counter_candidates = 0
         
@@ -51,7 +51,7 @@ class HiddenModel:
                 
                 #normalise the probabilities and add the current trellis level to the trellis
                 #self.normaliseEmittedProbabilities(current_trellis_level)
-                self.candidates_trellis.append(current_trellis_level)
+                self.candidate_graph.append(current_trellis_level)
             
             #update progressbar
             pb.setValue(pb.value() + 1)
@@ -60,19 +60,19 @@ class HiddenModel:
         return 0
     
     def getTrellisEntryById(self, id, level):
-        for entry in self.candidates_trellis[level]:
+        for entry in self.candidate_graph[level]:
             if entry.get('id') == id:
                 return entry
     
     def createBacktracking(self, pb):
         #init progressbar
         pb.setValue(0)
-        pb.setMaximum(len(self.candidates_trellis))
+        pb.setMaximum(len(self.candidate_graph))
         QApplication.processEvents()
         
         self.candidates_backtracking = {}
         
-        for i, trellis_level in enumerate(self.candidates_trellis):
+        for i, trellis_level in enumerate(self.candidate_graph):
             
             #the candidates of the first observation have no parent
             if i != 0:
@@ -100,8 +100,8 @@ class HiddenModel:
         #find the highest total probability in the last trellis level
         highest_prob = 0.0
         id = None
-        trellis_counter = len(self.candidates_trellis) - 1
-        last_trellis_level = self.candidates_trellis[trellis_counter]
+        trellis_counter = len(self.candidate_graph) - 1
+        last_trellis_level = self.candidate_graph[trellis_counter]
         for entry in last_trellis_level:
             if entry.get('total_probability') > highest_prob:
                 highest_prob = entry.get('total_probability')
@@ -141,8 +141,8 @@ class HiddenModel:
             if i != 0:
                 
                 #get the current and previous trellis level
-                previous_trellis_level = self.candidates_trellis[i - 1]
-                current_trellis_level = self.candidates_trellis[i]
+                previous_trellis_level = self.candidate_graph[i - 1]
+                current_trellis_level = self.candidate_graph[i]
                 
                 for previous_entry in previous_trellis_level:
                     
@@ -191,7 +191,7 @@ class HiddenModel:
             return False
     
     def setStartingProbabilities(self, pb):
-        first_tellis_level = self.candidates_trellis[0]
+        first_tellis_level = self.candidate_graph[0]
         
         #init progressbar
         pb.setValue(0)
