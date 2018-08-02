@@ -57,12 +57,12 @@ A candidate point is a possible position of an observation on the network.
 The plugin searches the nearest points on every linestring for each observation.
 If the distance between a candidate and the correpsonding observation is less or equal the maximum search distance,
 the candidate will be added to the candidate graph (Budig 2012: 14):
-<img source="screenshots/candidates.png" />
+<img src="screenshots/candidates.png" />
 "A candidate graph is a directed acyclic graph (DAG) which represents all paths that are
 considered possible final matching results for the given GPS trajectory" (Budig 2012: 13). The graph will be used as a stochastic matrix
 for the HMM. The graph has n layers with n as the count of observations.
 Each level contains all candidates of the same/corresponding observation (Budig 2012: 13):
-<img source="screenshots/graph.png" />
+<img src="screenshots/graph.png" />
 The calculation of candidates has a huge impact of the computation time. A higher search distance can result in more candidates per
 observation and more possible paths, which will be calculated in the next steps. Also a high segmentation of the network can cause
 a lot of candidates per observation with the same problem for the computation time.
@@ -98,7 +98,7 @@ The directions will be calculated using the slope of the two lines through both 
 The angle is the arcustanges of the slope and will have a value between 0 and 180 (the python function atan is used and the
 result will be summed up by 90 to receive positive values). The difference of this two angles will be normalised to receive
 a value between 0 and 1 (Budig 2012: 17):
-<img source="screenshots/direction.png" />
+<img src="screenshots/direction.png" />
 
 ### Viterbi algorithm
 Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
