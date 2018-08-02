@@ -57,12 +57,12 @@ A candidate point is a possible position of an observation on the network.
 The plugin searches the nearest points on every linestring for each observation.
 If the distance between a candidate and the correpsonding observation is less or equal the maximum search distance,
 the candidate will be added to the candidate graph (Budig 2012: 14):
-<img source="" />
+<img source="screenshots/candidates.png" />
 "A candidate graph is a directed acyclic graph (DAG) which represents all paths that are
 considered possible final matching results for the given GPS trajectory" (Budig 2012: 13). The graph will be used as a stochastic matrix
 for the HMM. The graph has n layers with n as the count of observations.
 Each level contains all candidates of the same/corresponding observation (Budig 2012: 13):
-<img source="" />
+<img source="screenshots/graph.png" />
 The calculation of candidates has a huge impact of the computation time. A higher search distance can result in more candidates per
 observation and more possible paths, which will be calculated in the next steps. Also a high segmentation of the network can cause
 a lot of candidates per observation with the same problem for the computation time.
@@ -71,10 +71,7 @@ a lot of candidates per observation with the same problem for the computation ti
 A GNSS-measured position is not the real position because of the inaccuracy of the GNSS signal. Also the quality of the network geometry
 can be very low. Therefore the candidates are more or less away from the observations.
 To calculate the probability, that an observation was emitted by a candidate, a normal distribution is postulated, i.e.
-the pobability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13):
-<img source="" />
-The emission probabilities for each candidate are one part of the five tupel of a Hidden Markow Model (Haenelt 2007: 4-5).
-The emission probabilities of the candidates of the first observation will be used as initial state
+the pobability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13). The emission probabilities for each candidate are one part of the five tupel of a Hidden Markow Model (Haenelt 2007: 4-5). The emission probabilities of the candidates of the first observation will be used as initial state
 probabilities in the HMM and represent another part of the five tupel (Raymond et al. 2012: 2244).
 The expected value and the standard deviation can be set by the user. The expected value represents the best possible or expected distance between
 a candidate and an observer. In most cases, this should be a value of zero.
@@ -90,6 +87,7 @@ The transition between two candidates will be compared by the transition between
 of the transitions will be compared:
 1. the distances
 2. the directions
+<br>
 The euklidean distance between the two observations will be put in relation to the distance on the network between the two candidates (Budig 2012: 12).
 The distance on the network will be calculated using the analysis framework of QGIS and the Dijkstra algorithm with the distance between nodes as
 edge weight.
@@ -100,7 +98,7 @@ The directions will be calculated using the slope of the two lines through both 
 The angle is the arcustanges of the slope and will have a value between 0 and 180 (the python function atan is used and the
 result will be summed up by 90 to receive positive values). The difference of this two angles will be normalised to receive
 a value between 0 and 1 (Budig 2012: 17):
-<img source="" />
+<img source="screenshots/direction.png" />
 
 ### Viterbi algorithm
 Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
