@@ -37,7 +37,7 @@ and the more computation time is needed
 
 ## Description of the computation
 First the plugin calculates possible candidate points for each observation point in the trajectory (Budig 2012: 10).
-The candidates will be arranged in a candidate graph with n levels, n = count of observation points (Budig 2012: 13).
+The candidates will be arranged in a candidate graph with n layers, n = count of observation points (Budig 2012: 13).
 After calculating different posibilities, the path with the highest posibility will be found using the Viterbi algorithm.
 Following the different parts of the computation in a nutshell, followed by explicit descriptions of each step:
 - read the input layers
@@ -62,7 +62,7 @@ the candidate will be added to the candidate graph (Budig 2012: 14):
 "A candidate graph is a directed acyclic graph (DAG) which represents all paths that are
 considered possible final matching results for the given GPS trajectory" (Budig 2012: 13). The graph will be used as a stochastic matrix
 for the HMM. The graph has n layers with n as the count of observations.
-Each level contains all candidates of the same/corresponding observation (Budig 2012: 13):
+Each layer contains all candidates of the same/corresponding observation (Budig 2012: 13):
 <img src="screenshots/graph.png" />
 <br>
 The calculation of candidates has a huge impact of the computation time. A higher search distance can result in more candidates per
