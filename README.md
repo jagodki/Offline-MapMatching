@@ -58,11 +58,13 @@ The plugin searches the nearest points on every linestring for each observation.
 If the distance between a candidate and the correpsonding observation is less or equal the maximum search distance,
 the candidate will be added to the candidate graph (Budig 2012: 14):
 <img src="screenshots/candidates.png" />
+<br>
 "A candidate graph is a directed acyclic graph (DAG) which represents all paths that are
 considered possible final matching results for the given GPS trajectory" (Budig 2012: 13). The graph will be used as a stochastic matrix
 for the HMM. The graph has n layers with n as the count of observations.
 Each level contains all candidates of the same/corresponding observation (Budig 2012: 13):
 <img src="screenshots/graph.png" />
+<br>
 The calculation of candidates has a huge impact of the computation time. A higher search distance can result in more candidates per
 observation and more possible paths, which will be calculated in the next steps. Also a high segmentation of the network can cause
 a lot of candidates per observation with the same problem for the computation time.
