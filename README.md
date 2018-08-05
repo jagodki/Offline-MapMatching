@@ -114,18 +114,31 @@ returns linestrings, which will be written to a new memory layer. The plugin pro
 red line.
 
 ## Screenshots of matched and unmatched trajectories
-
+<table style="width:100%">
+    <tr>
+        <th>not successful matched</th>
+        <th>successful matched</th> 
+        <th>successful matched</th>
+        <th>legend</th>
+    </tr>
+    <tr>
+        <td><img src="screenshots/not_correct.png" /></td>
+        <td><img src="screenshots/correct.png" /></td>
+        <td><img src="screenshots/correct_2.png" /></td>
+        <td><img src="screenshots/legend.png" /></td>
+    </tr>
+</table>
 
 ## Sources
 Budig, B. (2012). <i>An algorithm for map matching on incomplete road databases</i>. 
 Retrieved Jul 31, 2018 from 
 <a href="http://www1.pub.informatik.uni-wuerzburg.de/pub/theses/2012-budig-bachelor.pdf">http://www1.pub.informatik.uni-wuerzburg.de/pub/theses/2012-budig-bachelor.pdf</a>
-<br>
+<br><br>
 Raymond, R., Morimura, T., Osogami, T., Hirosue, N. (2012). <i>Map Matching with Hidden Markov Model on Sampled Road Network</i>. 
 21st International Conference on Pattern Recognition (ICPR 2012). 
 Retrieved Jul 31, 2018 from 
 <a href="http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf">http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf</a>
-<br>
+<br><br>
 Haenelt, K. (2007). <i>Der Viterbi-Algorithmus. Eine Erläuterung der formalen Spezifikation am Beispiel des Part-of-Speech Tagging</i>. 
 Retrieved Jul 31, 2018 from 
 <a href="http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf">http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf</a>

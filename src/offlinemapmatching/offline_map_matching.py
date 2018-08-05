@@ -172,11 +172,13 @@ class OfflineMapMatching:
         if add_to_toolbar:
             self.toolbar.addAction(action)
 
-        if add_to_menu:
-            self.iface.addPluginToVectorMenu(
-                self.menu,
-                action)
+#        if add_to_menu:
+#            self.iface.addPluginToVectorMenu(
+#                self.menu,
+#                action)
 
+        self.iface.vectorMenu().addAction(action)
+        
         self.actions.append(action)
 
         return action
@@ -209,6 +211,14 @@ class OfflineMapMatching:
         self.populateComboBox('network')
         self.populateComboBox('trajectory')
         self.populateComboBox('fields')
+        
+        #clear all other gui elements
+        self.dlg.progressBar.setValue(0)
+        self.dlg.doubleSpinBox_sigma.setValue(50.0)
+        self.dlg.doubleSpinBox_my.setValue(0.0)
+        self.dlg.doubleSpinBox_max.setValue(0.0)
+        self.dlg.label_info.setText('')
+        self.dlg.lineEdit_crs.setText('')
         
         # show the dialog
         self.dlg.show()
