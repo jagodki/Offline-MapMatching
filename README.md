@@ -127,6 +127,12 @@ red line.
         <td><img src="screenshots/correct_2.png" /></td>
         <td><img src="screenshots/legend.png" /></td>
     </tr>
+    <tr>
+        <td>st. deviation = 10, max. search dist. = 25</td>
+        <td>st. deviation = 10, max. search dist. = 25</td>
+        <td>st. deviation = 12, max. search dist. = 30</td>
+        <td></td>
+    </tr>
 </table>
 
 ## Sources
