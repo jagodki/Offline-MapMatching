@@ -50,7 +50,7 @@ Following the different parts of the computation in a nutshell, followed by expl
 ### read the input layers
 The network and the trajectory layers will be imported into the plugin and the internal structur of objects will be initialised.
 The trajectory cannot be imported, if the layer has no attribute fields.
-Each position of the trajectory is called observation and one part of the five tupel of a Hidden Markow Model (HMM).
+Each position of the trajectory is called observation and one part of the five tupel of a Hidden Markov Model (HMM).
 
 ### calculate candidate points/create candidate graph
 A candidate point is a possible position of an observation on the network.
@@ -73,7 +73,7 @@ a lot of candidates per observation with the same problem for the computation ti
 A GNSS-measured position is not the real position because of the inaccuracy of the GNSS signal. Also the quality of the network geometry
 can be very low. Therefore the candidates are more or less away from the observations.
 To calculate the probability, that an observation was emitted by a candidate, a normal distribution is postulated, i.e.
-the pobability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13). The emission probabilities for each candidate are one part of the five tupel of a Hidden Markow Model (Haenelt 2007: 4-5). The emission probabilities of the candidates of the first observation will be used as initial state
+the pobability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13). The emission probabilities for each candidate are one part of the five tupel of a Hidden Markov Model (Haenelt 2007: 4-5). The emission probabilities of the candidates of the first observation will be used as initial state
 probabilities in the HMM and represent another part of the five tupel (Raymond et al. 2012: 2244).
 The expected value and the standard deviation can be set by the user. The expected value represents the best possible or expected distance between
 a candidate and an observer. In most cases, this should be a value of zero.
