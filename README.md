@@ -113,6 +113,33 @@ The founded Viterbi path represents the vertices of the resulting line. A routin
 returns linestrings, which will be written to a new memory layer. The plugin provides a style file, so that the new layer will be displayed as a
 red line.
 
+## Attribute Table of the resulting layer
+<table style="width:100%">
+    <tr>
+        <th>id</th>
+        <th>total_probability_start</th>
+        <th>total_probability_end</th>
+        <th>emission_probability_start</th>
+        <th>emission_probability_end</th>
+        <th>transition_probability_start</th>
+        <th>transition_probability_end</th>
+        <th>observation_id_start</th>
+        <th>observation_id_end</th>
+    </tr>
+    <tr>
+        <td>an integer value as counter of the linestrings</td>
+        <td>the total probability of the start vertex of the current linestring, i.e. the product of the emission and transition probability of the start vertex and the total probability of the parent vertex/candidate</td>
+        <td>the total probability of the end vertex of the current linestring, i.e. the product of the emission and transition probability of the end vertex and the total probability of the parent vertex/candidate (should be the start vertex of the current linestring)</td>
+        <td>the emission probability of the start vertex</td>
+        <td>the emission probability of the end vertex</td>
+        <td>the transition probability to reach the start vertex</td>
+        <td>the transition probability to reach the end vertex</td>
+        <td>the id of the trajectory feature, which corresponds to the start vertex</td>
+        <td>the id of the trajectory feature, which corresponds to the end vertex</td>
+    </tr>></td>
+    </tr>
+</table>
+
 ## Screenshots of matched and unmatched trajectories
 <table style="width:100%">
     <tr>
@@ -145,7 +172,7 @@ Raymond, R., Morimura, T., Osogami, T., Hirosue, N. (2012). <i>Map Matching with
 Retrieved Jul 31, 2018 from 
 <a href="http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf">http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf</a>
 <br><br>
-Haenelt, K. (2007). <i>Der Viterbi-Algorithmus. Eine Erläuterung der formalen Spezifikation am Beispiel des Part-of-Speech Tagging</i>. 
+Haenelt, K. (2007). <i>Der Viterbi-Algorithmus. Eine Erl\ufffduterung der formalen Spezifikation am Beispiel des Part-of-Speech Tagging</i>. 
 Retrieved Jul 31, 2018 from 
 <a href="http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf">http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf</a>
 <br>
