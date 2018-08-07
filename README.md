@@ -102,6 +102,37 @@ result will be summed up by 90 to receive positive values). The difference of th
 a value between 0 and 1 (Budig 2012: 17):
 <img src="screenshots/direction.png" />
 
+## Attribute Table of the resulting layer
+#### id
+an integer value as counter of the linestrings
+
+#### total_probability_start
+the total probability of the start vertex of the current linestring, i.e. the product
+of the emission and transition probability of the start vertex and the total probability of the parent vertex/candidate
+
+#### total_probability_end
+the total probability of the end vertex of the current linestring, i.e. the product of the emission
+and transition probability of the end vertex and the total probability of the parent vertex/candidate
+(should be the start vertex of the current linestring)
+
+#### emission_probability_start
+the emission probability of the start vertex
+
+#### emission_probability_end
+the emission probability of the end vertex
+
+#### transition_probability_start
+the transition probability to reach the start vertex
+
+#### transition_probability_end
+the transition probability to reach the end vertex
+
+#### observation_id_start
+the id of the trajectory feature, which corresponds to the start vertex
+
+#### observation_id_end
+the id of the trajectory feature, which corresponds to the end vertex
+
 ### Viterbi algorithm
 Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
 The Viterbi algorithm uses results of former calculations again to avoid multiple calculations of same sequences.
