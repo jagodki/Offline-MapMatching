@@ -63,7 +63,6 @@ class HiddenModel:
         for entry in self.candidate_graph[level]:
             if entry.get('id') == id:
                 return entry
-        print(id)
     
     def createBacktracking(self, pb):
         #init progressbar
@@ -104,7 +103,7 @@ class HiddenModel:
         trellis_counter = len(self.candidate_graph) - 1
         last_trellis_level = self.candidate_graph[trellis_counter]
         for entry in last_trellis_level:
-            if entry.get('total_probability') > highest_prob:
+            if entry.get('total_probability') >= highest_prob:
                 highest_prob = entry.get('total_probability')
                 id = entry.get('id')
         

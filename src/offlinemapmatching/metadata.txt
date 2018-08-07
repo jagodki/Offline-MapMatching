@@ -24,7 +24,7 @@ repository=https://github.com/jagodki/Offline-MapMatching
 
 # Uncomment the following line and add your changelog:
 changelog=
-	1.0.1 - adjust field names of result layer
+	1.0.1 - adjust field names of result layer and some minor changes
 	1.0.0 - first release
 
 # Tags are comma separated with spaces allowed

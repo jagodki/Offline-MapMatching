@@ -262,7 +262,7 @@ class OfflineMapMatching:
                           self.dlg.lineEdit_crs.text())
             
             if result == 0:
-                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(time.time() - start_time) + ' sec', level=Qgis.Success, duration=60)
+                self.iface.messageBar().pushMessage('Chainage finished ^o^ - time: ' + str(round(time.time() - start_time, 2)) + ' sec', level=Qgis.Success, duration=60)
             elif result == -1:
                 self.iface.messageBar().pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
             elif result == -3:
