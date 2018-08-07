@@ -39,10 +39,10 @@ class HiddenModel:
                 #create the current level of the trellis
                 current_trellis_level = []
                 for candidate in candidates:
-                    candidate.calculateEmittedProbability(observation, sigma, my)
+                    candidate.calculateEmissionProbability(observation, sigma, my)
                     current_trellis_level.append({'id' : str(self.counter_candidates),
                                                   'observation_id' : i,
-                                                  'emitted_probability' : candidate.emitted_probability,
+                                                  'emitted_probability' : candidate.emission_probability,
                                                   'transition_probabilities' : {},
                                                   'transition_probability' : 0.0,
                                                   'total_probability' : 0.0})
@@ -56,7 +56,7 @@ class HiddenModel:
             #update progressbar
             pb.setValue(pb.value() + 1)
             QApplication.processEvents()
-        
+            
         return 0
     
     def getTrellisEntryById(self, id, level):
@@ -103,7 +103,7 @@ class HiddenModel:
         trellis_counter = len(self.candidate_graph) - 1
         last_trellis_level = self.candidate_graph[trellis_counter]
         for entry in last_trellis_level:
-            if entry.get('total_probability') > highest_prob:
+            if entry.get('total_probability') >= highest_prob:
                 highest_prob = entry.get('total_probability')
                 id = entry.get('id')
         
@@ -240,8 +240,8 @@ class HiddenModel:
         layer_data.addAttributes([QgsField('id', QVariant.Int),
                                   QgsField('total_probability_start', QVariant.Double),
                                   QgsField('total_probability_end', QVariant.Double),
-                                  QgsField('emitted_probability_start', QVariant.Double),
-                                  QgsField('emitted_probability_end', QVariant.Double),
+                                  QgsField('emission_probability_start', QVariant.Double),
+                                  QgsField('emission_probability_end', QVariant.Double),
                                   QgsField('transition_probability_start', QVariant.Double),
                                   QgsField('transition_probability_end', QVariant.Double),
                                   QgsField('observation_id_start', QVariant.Int),
@@ -273,8 +273,8 @@ class HiddenModel:
                 feature.setAttribute('id', i)
                 feature.setAttribute('total_probability_start', vertices[i - 1]['total_probability'])
                 feature.setAttribute('total_probability_end', vertex['total_probability'])
-                feature.setAttribute('emitted_probability_start', vertices[i - 1]['emitted_probability'])
-                feature.setAttribute('emitted_probability_end', vertex['emitted_probability'])
+                feature.setAttribute('emission_probability_start', vertices[i - 1]['emitted_probability'])
+                feature.setAttribute('emission_probability_end', vertex['emitted_probability'])
                 feature.setAttribute('transition_probability_start', vertices[i - 1]['transition_probability'])
                 feature.setAttribute('transition_probability_end', vertex['transition_probability'])
                 feature.setAttribute('observation_id_start', vertices[i - 1]['observation_id'])
