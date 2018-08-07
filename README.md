@@ -102,6 +102,17 @@ result will be summed up by 90 to receive positive values). The difference of th
 a value between 0 and 1 (Budig 2012: 17):
 <img src="screenshots/direction.png" />
 
+### Viterbi algorithm
+Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
+The Viterbi algorithm uses results of former calculations again to avoid multiple calculations of same sequences.
+Also just the highest probabilities to reach a candidate will be stored and reused (Haenelt 2007: 12).
+The most likely path through the HMM, i.e. the path through the candidate graph with the highest probability, is the result of this algorithm.
+
+### store the path in a new layer
+The founded Viterbi path represents the vertices of the resulting line. A routing between following points of the Viterbi path
+returns linestrings, which will be written to a new memory layer. The plugin provides a style file, so that the new layer will be displayed as a
+red line.
+
 ## Attribute Table of the resulting layer
 #### id
 an integer value as counter of the linestrings
@@ -132,44 +143,6 @@ the id of the trajectory feature, which corresponds to the start vertex
 
 #### observation_id_end
 the id of the trajectory feature, which corresponds to the end vertex
-
-### Viterbi algorithm
-Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
-The Viterbi algorithm uses results of former calculations again to avoid multiple calculations of same sequences.
-Also just the highest probabilities to reach a candidate will be stored and reused (Haenelt 2007: 12).
-The most likely path through the HMM, i.e. the path through the candidate graph with the highest probability, is the result of this algorithm.
-
-### store the path in a new layer
-The founded Viterbi path represents the vertices of the resulting line. A routing between following points of the Viterbi path
-returns linestrings, which will be written to a new memory layer. The plugin provides a style file, so that the new layer will be displayed as a
-red line.
-
-## Attribute Table of the resulting layer
-<table style="width:100%">
-    <tr>
-        <th>id</th>
-        <th>total_probability_start</th>
-        <th>total_probability_end</th>
-        <th>emission_probability_start</th>
-        <th>emission_probability_end</th>
-        <th>transition_probability_start</th>
-        <th>transition_probability_end</th>
-        <th>observation_id_start</th>
-        <th>observation_id_end</th>
-    </tr>
-    <tr>
-        <td>an integer value as counter of the linestrings</td>
-        <td>the total probability of the start vertex of the current linestring, i.e. the product of the emission and transition probability of the start vertex and the total probability of the parent vertex/candidate</td>
-        <td>the total probability of the end vertex of the current linestring, i.e. the product of the emission and transition probability of the end vertex and the total probability of the parent vertex/candidate (should be the start vertex of the current linestring)</td>
-        <td>the emission probability of the start vertex</td>
-        <td>the emission probability of the end vertex</td>
-        <td>the transition probability to reach the start vertex</td>
-        <td>the transition probability to reach the end vertex</td>
-        <td>the id of the trajectory feature, which corresponds to the start vertex</td>
-        <td>the id of the trajectory feature, which corresponds to the end vertex</td>
-    </tr>></td>
-    </tr>
-</table>
 
 ## Screenshots of matched and unmatched trajectories
 <table style="width:100%">
