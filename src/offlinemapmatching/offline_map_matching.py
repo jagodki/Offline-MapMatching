@@ -271,7 +271,7 @@ class OfflineMapMatching:
                 self.iface.messageBar().pushMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Warning, duration=60)
     
         except:
-            QgsMessageLog.logMessage(traceback.print_exc(), level=Qgis.Critical)
+            QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)
             self.iface.messageBar().pushMessage('An error occured. Please look into the log and/or Python console for further information.', level=Qgis.Critical, duration=60)
         
         
