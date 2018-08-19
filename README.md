@@ -73,7 +73,7 @@ a lot of candidates per observation with the same problem for the computation ti
 A GNSS-measured position is not the real position because of the inaccuracy of the GNSS signal. Also the quality of the network geometry
 can be very low. Therefore the candidates are more or less away from the observations.
 To calculate the probability, that an observation was emitted by a candidate, a normal distribution is postulated, i.e.
-the pobability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13). The emission probabilities for each candidate are one part of the five tupel of a Hidden Markov Model (Haenelt 2007: 4-5). The emission probabilities of the candidates of the first observation will be used as initial state
+the probability is pending on the distance between observation and candidate and will be calculated using the normal distribution (Budig 2012: 13). The emission probabilities for each candidate are one part of the five tupel of a Hidden Markov Model (Haenelt 2007: 4-5). The emission probabilities of the candidates of the first observation will be used as initial state
 probabilities in the HMM and represent another part of the five tupel (Raymond et al. 2012: 2244).
 The expected value and the standard deviation can be set by the user. The expected value represents the best possible or expected distance between
 a candidate and an observer. In most cases, this should be a value of zero.
@@ -103,7 +103,7 @@ a value between 0 and 1 (Budig 2012: 17):
 <img src="screenshots/direction.png" />
 
 ### Viterbi algorithm
-Using the Viterbi algorithm all pobabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
+Using the Viterbi algorithm all probabilities (initial, emission and transition) along each path will be multiplied in an efficient way.
 The Viterbi algorithm uses results of former calculations again to avoid multiple calculations of same sequences.
 Also just the highest probabilities to reach a candidate will be stored and reused (Haenelt 2007: 12).
 The most likely path through the HMM, i.e. the path through the candidate graph with the highest probability, is the result of this algorithm.
