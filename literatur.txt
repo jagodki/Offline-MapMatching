@@ -1,4 +1,0 @@
-http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf
-http://www1.pub.informatik.uni-wuerzburg.de/pub/theses/2012-budig-bachelor.pdf
-http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf
-https://www.researchgate.net/publication/308856380_Fast_Hidden_Markov_Model_Map-Matching_for_Sparse_and_Noisy_Trajectories

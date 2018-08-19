@@ -13,9 +13,6 @@ can be e.g. outliers in the trajectory or crossings of edges in the network.
 This plugin provides a statistical approach to solve the problem of offline map matching using the principles of 
 Hidden Markov Models (HMM) and the Viterbi algorithm.
 
-## Change log
-1.0.0 - first release
-
 ## Hints for developement
 - the plugin was created using the QGIS-plugin "plugin builder"
 - all additional python files were created in the
