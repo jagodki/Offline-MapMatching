@@ -30,7 +30,6 @@ and the more computation time is needed
 (the algorithm does not know, which observation is an outlier, and searches the most likely path for the whole trajectory)
 - the distance between two observations of the trajectory should be 100m maximum, a low distance results in a better map matching
 - if positions where measured time-controlled, standing times should be removed before running the plugin
-- 2.5D-geometries are not supported, i.e. trajectories and networks with 2.5D-geometries will not be displayed in the comboboxes
 
 ## Description of the computation
 First the plugin calculates possible candidate points for each observation point in the trajectory (Budig 2012: 10).
