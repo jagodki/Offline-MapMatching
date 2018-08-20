@@ -21,7 +21,7 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 ## Hints for usage
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
 and written to the QGIS-log
-- it is recommended to set the meaximum search distance as low as possible, because this setting has a very huge influence on the computation time
+- it is recommended to set the maximum search distance as low as possible, because this setting has a very huge influence on the computation time
 - it is recommended to use a low segmented network layer, because candidate points will be searched for
 every linestring, i.e. the more linestrings can be found in the maximum search distance, the more candidates will be found
 and the more computation time is needed
@@ -30,7 +30,7 @@ and the more computation time is needed
 (the algorithm does not know, which observation is an outlier, and searches the most likely path for the whole trajectory)
 - the distance between two observations of the trajectory should be 100m maximum, a low distance results in a better map matching
 - if positions where measured time-controlled, standing times should be removed before running the plugin
-
+- 2.5D-geometries are not supported, i.e. trajectories and networks with 2.5D-geometries will not be displayed in the comboboxes
 
 ## Description of the computation
 First the plugin calculates possible candidate points for each observation point in the trajectory (Budig 2012: 10).

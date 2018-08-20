@@ -78,7 +78,7 @@ class MapMatcher:
         label.setText('finished ^o^')
         QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
         return 0
-    
+
     def fillLayerComboBox(self, iface, combobox, geom_type):
         #first clear the combobox
         combobox.clear()
@@ -89,9 +89,8 @@ class MapMatcher:
         
         #populate the combobox
         for layer in self.layers:
-            if (layer.wkbType() == QgsWkbTypes.Point and geom_type == "POINT") or (layer.wkbType() == QgsWkbTypes.LineString and geom_type == "LINESTRING"):
+            if (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.Point and geom_type == 'POINT') or (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString and geom_type == 'LINESTRING'):
                 combobox.addItem(layer.name())
-        
     
     def fillAttributeComboBox(self, combobox, layername):
         #first clear the combobox
