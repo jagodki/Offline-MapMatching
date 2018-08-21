@@ -73,8 +73,8 @@ the probability is pending on the distance between observation and candidate and
 probabilities in the HMM and represent another part of the five tupel (Raymond et al. 2012: 2244).
 The expected value and the standard deviation can be set by the user. The expected value represents the best possible or expected distance between
 a candidate and an observer. In most cases, this should be a value of zero.
-The standard deviation is more tricky. Remember, that 95.45% of all possible values (in this case the distances between candidates and an observer)
-are within 2*sigma, 99.73% within 3*sigma. In my tests I got good results setting the standard deviation equals (expected value) / (n) with
+The standard deviation of the distance between candidates and their observer is more tricky. Remember, that 95.45% of all possible values (distances between candidates and an observer)
+are within 2 * sigma, 99.73% within 3 * sigma. In my tests I got good results setting the standard deviation equals (maximum search distance) / (n) with
 n between 2 and 3. A too high or too low standard deviation can overemphasise or underemphasise the emission probability (compared to the transition
 probability) and maybe results in an incorrect map matching.
 
