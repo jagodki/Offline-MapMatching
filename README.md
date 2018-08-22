@@ -19,7 +19,14 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 <img src="screenshots/download_3.png" height="150">
 
 ## Usage
-*coming soon*
+Just fill in all entries in the plugin and click the start button. The 
+tool provides an explanation for each entry directly in the dialog. The 
+plugin will not run correctly, if at least one entry is not filled. During 
+the processing the dialog will be deactived until the processing finished. 
+Information about the current processing step will be written to the 
+QGIS-log and displayed above the progressbar. Further information, e.g. 
+detailed information about the algorithm, can be found under the next 
+captions.
 
 ## Hints for usage
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
@@ -33,6 +40,7 @@ and the more computation time is needed
 (the algorithm does not know, which observation is an outlier, and searches the most likely path for the whole trajectory)
 - the distance between two observations of the trajectory should be 100m maximum, a low distance results in a better map matching
 - if positions where measured time-controlled, standing times should be removed before running the plugin
+- multi-geometries are not supported, i.e. layers with this geometry type will not be displayed in the comboboxes
 
 ## Hints for developement
 - the plugin was created using the QGIS-plugin "plugin builder"
