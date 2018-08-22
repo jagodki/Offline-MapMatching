@@ -13,10 +13,17 @@ can be e.g. outliers in the trajectory or crossings of edges in the network.
 This plugin provides a statistical approach to solve the problem of offline map matching using the principles of 
 Hidden Markov Models (HMM) and the Viterbi algorithm.
 
-## Hints for developement
-- the plugin was created using the QGIS-plugin "plugin builder"
-- all additional python files were created in the
-<a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm">mm</a>-folder
+## Installation
+<table>
+<tr>
+<td><img src="screenshots/download_1.png"></td>
+<td><img src="screenshots/download_2.png"></td>
+<td><img src="screenshots/download_3.png"></td>
+</tr>
+</table>
+
+## Usage
+*coming soon*
 
 ## Hints for usage
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
@@ -30,6 +37,11 @@ and the more computation time is needed
 (the algorithm does not know, which observation is an outlier, and searches the most likely path for the whole trajectory)
 - the distance between two observations of the trajectory should be 100m maximum, a low distance results in a better map matching
 - if positions where measured time-controlled, standing times should be removed before running the plugin
+
+## Hints for developement
+- the plugin was created using the QGIS-plugin "plugin builder"
+- all additional python files were created in the
+<a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm">mm</a>-folder
 
 ## Description of the computation
 First the plugin calculates possible candidate points for each observation point in the trajectory (Budig 2012: 10).
