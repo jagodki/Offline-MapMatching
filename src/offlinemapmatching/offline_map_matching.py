@@ -26,7 +26,7 @@ from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import QAction
 from qgis.gui import QgsMessageBar
 from qgis.core import *
-import time, traceback
+import time, traceback, sys, inspect
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -35,9 +35,14 @@ from .offline_map_matching_dialog import OfflineMapMatchingDialog
 import os.path
 
 #import own classes
-from .mm.map_matcher import MapMatcher
+from .mm.map_matcher import *
+from .mm_processing.offline_map_matching_provider import *
+'''
+cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
-
+if cmd_folder not in sys.path:
+    sys.path.insert(0, cmd_folder)
+'''
 class OfflineMapMatching:
     '''QGIS Plugin Implementation.'''
 
@@ -49,6 +54,7 @@ class OfflineMapMatching:
             application at run time.
         :type iface: QgsInterface
         '''
+        
         # Save reference to the QGIS interface
         self.iface = iface
         # initialize plugin directory
@@ -78,15 +84,17 @@ class OfflineMapMatching:
         self.toolbar.setObjectName(u'OfflineMapMatching')
         
         #add help-document to the GUI
-        file = os.path.join(os.path.dirname(__file__),'help.html')
+        dir = os.path.dirname(__file__)
+        file = os.path.abspath(os.path.join(dir, 'help_docs', 'help.html'))
         if os.path.exists(file):
             with open(file) as helpf:
                 help = helpf.read()
                 self.dlg.textBrowser_help.insertHtml(help)
                 self.dlg.textBrowser_help.moveCursor(QTextCursor.Start)
         
-        #create additional instance vars
+        #declare additional instance vars
         self.map_matcher = MapMatcher()
+        self.provider = OfflineMapMatchingProvider()
         
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
@@ -184,18 +192,20 @@ class OfflineMapMatching:
         return action
 
     def initGui(self):
-        '''Create the menu entries and toolbar icons inside the QGIS GUI.'''
-
+        '''Create the menu entries, toolbar icons inside the QGIS GUI and add a new processing provider.'''
         icon_path = ':/plugins/offline_map_matching/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'Offline-MapMatching'),
             callback=self.run,
             parent=self.iface.mainWindow())
+        
+        #add the processing provider
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
 
     def unload(self):
-        '''Removes the plugin menu item and icon from QGIS GUI.'''
+        '''Removes the plugin menu item and icon from QGIS GUI. Remove the processing provider.'''
         for action in self.actions:
 #            self.iface.removePluginVectorMenu(
 #                self.tr(u'&Offline-MapMatching'),
@@ -204,6 +214,9 @@ class OfflineMapMatching:
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
+        
+        #remove the processing provider
+        QgsApplication.processingRegistry().removeProvider(self.provider)
 
 
     def run(self):
@@ -266,7 +279,7 @@ class OfflineMapMatching:
             elif result == -1:
                 self.iface.messageBar().pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
             elif result == -3:
-                self.iface.messageBar().pushMessage('Something went wrong with the hidden markow model. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
+                self.iface.messageBar().pushMessage('Something went wrong with the Hidden Markov Model. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
             elif result == -5:
                 self.iface.messageBar().pushMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Warning, duration=60)
     

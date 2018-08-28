@@ -17,11 +17,11 @@ class HiddenModel:
         self.candidate_graph = []
         self.candidates = {}
         self.candidates_backtracking = {}
-        self.pb = None
     
-    def createGraph(self, sigma, my, maximum_distance):
+    def createGraph(self, sigma, my, maximum_distance, pb):
         #init progressbar
-        self.initProgressbar(len(self.trajectory.observations))
+        pb.setValue(0)
+        pb.setMaximum(len(self.trajectory.observations))
         
         #init data structur
         self.candidate_graph = []
@@ -29,7 +29,7 @@ class HiddenModel:
         self.counter_candidates = 0
         
         #iterate over all observations from our trajectory
-        for observation in self.trajectory.observations:
+        for i, observation in enumerate(self.trajectory.observations):
             
             #extract all candidates of the current observation
             candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
@@ -41,7 +41,7 @@ class HiddenModel:
                 for candidate in candidates:
                     candidate.calculateEmissionProbability(observation, sigma, my)
                     current_trellis_level.append({'id' : str(self.counter_candidates),
-                                                  'observation_id' : observation.id,
+                                                  'observation_id' : i,
                                                   'emitted_probability' : candidate.emission_probability,
                                                   'transition_probabilities' : {},
                                                   'transition_probability' : 0.0,
@@ -50,10 +50,12 @@ class HiddenModel:
                     self.counter_candidates += 1
                 
                 #normalise the probabilities and add the current trellis level to the trellis
+                #self.normaliseEmittedProbabilities(current_trellis_level)
                 self.candidate_graph.append(current_trellis_level)
             
             #update progressbar
-            self.updateProgressbar()
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
             
         return 0
     
@@ -62,9 +64,11 @@ class HiddenModel:
             if entry.get('id') == id:
                 return entry
     
-    def createBacktracking(self):
+    def createBacktracking(self, pb):
         #init progressbar
-        self.initProgressbar(len(self.candidate_graph))
+        pb.setValue(0)
+        pb.setMaximum(len(self.candidate_graph))
+        QApplication.processEvents()
         
         self.candidates_backtracking = {}
         
@@ -84,7 +88,8 @@ class HiddenModel:
                             self.candidates_backtracking.update({entry.get('id') : key})
             
             #update progressbar
-            self.updateProgressbar()
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
         
         return 0
     
@@ -124,9 +129,11 @@ class HiddenModel:
         
         return viterbi_path
     
-    def setTransitionProbabilities(self):
+    def setTransitionProbabilities(self, pb):
         #init progressbar
-        self.initProgressbar(len(self.trajectory.observations))
+        pb.setValue(0)
+        pb.setMaximum(len(self.trajectory.observations))
+        QApplication.processEvents()
         
         for i, observation in enumerate(self.trajectory.observations):
             
@@ -161,8 +168,12 @@ class HiddenModel:
                             #insert the probability into the trellis and sum up them
                             sum_prob += transition.transition_probability
                             current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
+                        
+                    #now normalise the probabilities of all transitions starting from the previous_entry
+                    #self.normaliseTransitionProbabilities(current_trellis_level, previous_entry.get('id'), sum_prob)
                 
-            self.updateProgressbar()
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
             
         return 0
     
@@ -179,50 +190,67 @@ class HiddenModel:
         else:
             return False
     
-    def setStartingProbabilities(self):
+    def setStartingProbabilities(self, pb):
         first_tellis_level = self.candidate_graph[0]
         
         #init progressbar
-        self.initProgressbar(len(first_tellis_level))
+        pb.setValue(0)
+        pb.setMaximum(len(first_tellis_level))
         
         for entry in first_tellis_level:
             entry.update({'total_probability' : entry.get('emitted_probability')})
             self.candidates_backtracking.update({entry.get('id') : None})
-            self.updateProgressbar()
+            pb.setValue(pb.value() + 1)
+            QApplication.processEvents()
         
         return 0
     
-    def addFeaturesToLayer(self, features, attributes, crs):
-        #create a new layer
-        layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
-        
-        #load the layer style
+    def normaliseTransitionProbabilities(self, trellis_level, id_of_starting_point, sum_of_probabilities):
+        for entry in trellis_level:
+            current_transition_probability = entry.get('transition_probabilities').get(id_of_starting_point)
+            if sum_of_probabilities != 0  and current_transition_probability is not None:
+                normalised_probability = current_transition_probability / sum_of_probabilities
+                entry.get('transition_probabilities').update({id_of_starting_point : normalised_probability})
+    
+    def normaliseEmittedProbabilities(self, trellis_level):
+        sum = 0.0
+        for candidate in trellis_level:
+            if candidate.get('emitted_probability') is not None:
+                sum += candidate.get('emitted_probability')
+        for candidate in trellis_level:
+            if sum != 0:
+                candidate.update({'emitted_probability' : candidate.get('emitted_probability') / sum})
+    
+    def addLayerToTheMap(self, layer):
+        #load the style
         dir = os.path.dirname(__file__)
         filename = os.path.abspath(os.path.join(dir, '..', '..', 'style.qml'))
-        layer.loadNamedStyle(filename, loadFromLocalDb=False)
+        test = layer.loadNamedStyle(filename, loadFromLocalDb=False)
+    
+        #add the layer to the map
+        QgsProject.instance().addMapLayer(layer)
+    
+    def getPathOnNetwork(self, vertices, pb, crs):
+        #create a new layer
+        layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
         
         #add the layer to the project
         layer.startEditing()
         layer_data = layer.dataProvider()
-        layer_data.addAttributes(attributes)
+        layer_data.addAttributes([QgsField('id', QVariant.Int),
+                                  QgsField('total_probability_start', QVariant.Double),
+                                  QgsField('total_probability_end', QVariant.Double),
+                                  QgsField('emission_probability_start', QVariant.Double),
+                                  QgsField('emission_probability_end', QVariant.Double),
+                                  QgsField('transition_probability_start', QVariant.Double),
+                                  QgsField('transition_probability_end', QVariant.Double),
+                                  QgsField('observation_id_start', QVariant.Int),
+                                  QgsField('observation_id_end', QVariant.Int)])
         layer.updateFields()
         
-        #add features to the layer
-        layer.addFeatures([feature])
-        layer.commitChanges()
-    
-        #add the layer to the map
-        QgsProject.instance().addMapLayer(layer)
-        
-        return layer
-    
-    def getPathOnNetwork(self, vertices):
         #init progressbar
-        self.initProgressbar(len(vertices))
-        
-        #create an array to store all features
-        features = []
-        
+        pb.setValue(0)
+        pb.setMaximum(len(vertices))
         #iterate over the vertices
         for i, vertex in enumerate(vertices):
             
@@ -251,20 +279,11 @@ class HiddenModel:
                 feature.setAttribute('transition_probability_end', vertex['transition_probability'])
                 feature.setAttribute('observation_id_start', vertices[i - 1]['observation_id'])
                 feature.setAttribute('observation_id_end', vertex['observation_id'])
-                features.append(feature)
+                layer.addFeatures([feature])
             
-            self.updateProgressbar()
-        
-        return features
-    
-    def initProgressbar(self, maximum):
-        if self.pb is not None:
-            self.pb.setValue(0)
-            self.pb.setMaximum(maximum)
-            QApplication.processEvents()
-    
-    def updateProgressbar(self):
-        if self.pb is not None:
             pb.setValue(pb.value() + 1)
             QApplication.processEvents()
+        
+        layer.commitChanges()
+        return layer
     
