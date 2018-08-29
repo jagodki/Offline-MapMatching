@@ -18,7 +18,7 @@ class MapMatcher:
         
         label.setText('initialise data structur')
         QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
-        self.setUp(network_name, trajectory_name, attribute_name)
+        self.setUp(network_name, trajectory_name, attribute_name, pb)
         
         label.setText('create candidate graph')
         QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
@@ -65,7 +65,7 @@ class MapMatcher:
         
         label.setText('get network path')
         QgsMessageLog.logMessage('get network path', level=Qgis.Info)
-        features = self.hidden_model.getPathOnNetwork(vertices)
+        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes)
         if layer == -1:
             label.setText('cannot map trajectory')
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
@@ -86,7 +86,7 @@ class MapMatcher:
         current = 1
         
         QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
-        self.setUp(network_name, trajectory_name, attribute_name)
+        self.setUp(network_name, trajectory_name, attribute_name, None)
         feedback.setProgress(int(current * total))
         current += 1
         

@@ -265,6 +265,6 @@ class HiddenModel:
     
     def updateProgressbar(self):
         if self.pb is not None:
-            pb.setValue(pb.value() + 1)
+            self.pb.setValue(self.pb.value() + 1)
             QApplication.processEvents()
     

@@ -263,7 +263,7 @@ class OfflineMapMatching:
         
         try:
             start_time = time.time()
-            result = self.map_matcher.startViterbiMatching(
+            result = self.map_matcher.startViterbiMatchingGui(
                           self.dlg.progressBar,
                           self.dlg.comboBox_trajectory.currentText(),
                           self.dlg.comboBox_network.currentText(),
