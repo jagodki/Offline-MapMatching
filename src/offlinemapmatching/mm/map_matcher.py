@@ -65,14 +65,13 @@ class MapMatcher:
         
         label.setText('get network path')
         QgsMessageLog.logMessage('get network path', level=Qgis.Info)
-        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes)
-        if layer == -1:
+        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
+        if features == -1:
             label.setText('cannot map trajectory')
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
             return -5
         
-        layer = self.hidden_model.addFeaturesToLayer(features, self.defineAttributes, crs)
-        self.hidden_model.addLayerToTheMap(layer)
+        layer = self.hidden_model.addFeaturesToLayer(features, self.defineAttributes(), crs)
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
         
@@ -132,10 +131,10 @@ class MapMatcher:
             return -3
         
         QgsMessageLog.logMessage('get network path', level=Qgis.Info)
-        features = self.hidden_model.getPathOnNetwork(vertices)
+        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
         feedback.setProgress(int(current * total))
         current += 1
-        if layer == -1:
+        if features == -1:
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
             return -5
         

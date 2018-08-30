@@ -208,7 +208,7 @@ class HiddenModel:
         layer.updateFields()
         
         #add features to the layer
-        layer.addFeatures([feature])
+        layer.addFeatures(features)
         layer.commitChanges()
     
         #add the layer to the map
@@ -216,7 +216,7 @@ class HiddenModel:
         
         return layer
     
-    def getPathOnNetwork(self, vertices):
+    def getPathOnNetwork(self, vertices, field_array):
         #init progressbar
         self.initProgressbar(len(vertices))
         
@@ -235,8 +235,11 @@ class HiddenModel:
                 if points == -1:
                     return points
                 
-                #now create a new line feature
-                feature = QgsFeature(layer.fields())
+                #now create a new line feature and add all needed fields
+                fields = QgsFields()
+                for field in field_array:
+                    fields.append(field)
+                feature = QgsFeature(fields)
                 
                 #create the geometry of the new feature
                 feature.setGeometry(QgsGeometry.fromPolylineXY(points))
