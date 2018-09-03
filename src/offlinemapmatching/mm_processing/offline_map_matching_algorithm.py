@@ -39,7 +39,10 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterVectorLayer,
                        QgsProcessingParameterField,
                        QgsProcessingParameterString,
-                       QgsProcessingParameterNumber)
+                       QgsProcessingParameterNumber,
+                       QgsWkbTypes,
+                       QgsCoordinateReferenceSystem,
+                       QgsFields)
 from ..mm.map_matcher import MapMatcher
 import time, os.path
 
@@ -114,7 +117,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
                 self.SIGMA,
                 self.tr('Standard Deviation [m]'),
                 type=QgsProcessingParameterNumber.Double,
-                defaultValue=0,
+                defaultValue=50,
                 minValue=0.0
             )
         )
@@ -152,6 +155,12 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         '''
         start_time = time.time()
         mm = MapMatcher()
+        
+        #create a QgsFields-object
+        attrs = mm.defineAttributes()
+        fields = QgsFields()
+        for field in attrs:
+            fields.append(field)
         
         #extract all parameters
         network_layer = self.parameterAsVectorLayer(
@@ -199,7 +208,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         (sink, dest_id) = self.parameterAsSink(
             parameters, self.OUTPUT,
             context,
-            mm.defineAttributes(),
+            fields,
             QgsWkbTypes.LineString,
             QgsCoordinateReferenceSystem('EPSG:' + crs)
         )
