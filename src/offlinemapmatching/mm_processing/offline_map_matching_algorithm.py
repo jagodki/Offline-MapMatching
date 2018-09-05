@@ -234,7 +234,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         '''
-        return 'Match Trajectory'
+        return 'match_trajectory'
     
     def helpUrl(self):
         '''
@@ -261,7 +261,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         Returns the translated algorithm name, which should be used for any
         user-visible display of the algorithm name.
         '''
-        return self.tr(self.name())
+        return self.tr('Match Trajectory')
 
     def group(self):
         '''
