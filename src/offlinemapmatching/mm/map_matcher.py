@@ -13,7 +13,7 @@ class MapMatcher:
         self.network = None
         self.trajectoy = None
     
-    def startViterbiMatching(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
+    def startViterbiMatchingGui(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
         check_results = 0
         
         label.setText('initialise data structur')
@@ -22,7 +22,7 @@ class MapMatcher:
         
         label.setText('create candidate graph')
         QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
-        check_results = self.hidden_model.createGraph(sigma, my, max_dist, pb)
+        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
         if check_results != 0:
             label.setText('cannot create candidate graph')
             QgsMessageLog.logMessage('cannot create candidate graph', level=Qgis.Info)
@@ -30,7 +30,7 @@ class MapMatcher:
         
         label.setText('calculate starting probabilities')
         QgsMessageLog.logMessage('calculate starting probabilities', level=Qgis.Info)
-        check_results = self.hidden_model.setStartingProbabilities(pb)
+        check_results = self.hidden_model.setStartingProbabilities()
         if check_results != 0:
             label.setText('cannot calculate starting probabilities')
             QgsMessageLog.logMessage('cannot calculate starting probabilities', level=Qgis.Info)
@@ -39,7 +39,7 @@ class MapMatcher:
         
         label.setText('calculate transition probabilities')
         QgsMessageLog.logMessage('calculate transition probabilities', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities(pb)
+        check_results = self.hidden_model.setTransitionProbabilities()
         if check_results != 0:
             label.setText('cannot calculate transition probabilities')
             QgsMessageLog.logMessage('cannot calculate transition probabilities', level=Qgis.Info)
@@ -48,7 +48,7 @@ class MapMatcher:
         
         label.setText('create backtracking')
         QgsMessageLog.logMessage('create backtracking', level=Qgis.Info)
-        check_results = self.hidden_model.createBacktracking(pb)
+        check_results = self.hidden_model.createBacktracking()
         if check_results != 0:
             label.setText('cannot create backtracking')
             QgsMessageLog.logMessage('cannot create backtracking', level=Qgis.Info)
@@ -65,20 +65,85 @@ class MapMatcher:
         
         label.setText('get network path')
         QgsMessageLog.logMessage('get network path', level=Qgis.Info)
-        layer = self.hidden_model.getPathOnNetwork(vertices, pb, 'EPSG:' + crs)
-        if layer == -1:
+        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
+        if features == -1:
             label.setText('cannot map trajectory')
             QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
             return -5
         
-        self.hidden_model.addLayerToTheMap(layer)
-        
+        layer = self.hidden_model.addFeaturesToLayer(features, self.defineAttributes(), crs)
         layer.select([])
         QgsProject.instance().addMapLayer(layer)
+        
         label.setText('finished ^o^')
         QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
         return 0
-
+    
+    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, sigma, my, max_dist, feature_sink, feedback):
+        check_results = 0
+        total = 100.0 / 8
+        current = 1
+        
+        QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
+        self.setUp(network_name, trajectory_name, attribute_name, None)
+        feedback.setProgress(int(current * total))
+        current += 1
+        
+        QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
+        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        feedback.setProgress(int(current * total))
+        current += 1
+        if check_results != 0:
+            QgsMessageLog.logMessage('cannot create candidate graph', level=Qgis.Info)
+            return -1
+        
+        QgsMessageLog.logMessage('calculate starting probabilities', level=Qgis.Info)
+        check_results = self.hidden_model.setStartingProbabilities()
+        feedback.setProgress(int(current * total))
+        current += 1
+        if check_results != 0:
+            QgsMessageLog.logMessage('cannot calculate starting probabilities', level=Qgis.Info)
+            return -3
+        
+        
+        QgsMessageLog.logMessage('calculate transition probabilities', level=Qgis.Info)
+        check_results = self.hidden_model.setTransitionProbabilities()
+        feedback.setProgress(int(current * total))
+        current += 1
+        if check_results != 0:
+            QgsMessageLog.logMessage('cannot calculate transition probabilities', level=Qgis.Info)
+            return -3
+        
+        QgsMessageLog.logMessage('create backtracking', level=Qgis.Info)
+        check_results = self.hidden_model.createBacktracking()
+        feedback.setProgress(int(current * total))
+        current += 1
+        if check_results != 0:
+            QgsMessageLog.logMessage('cannot create backtracking', level=Qgis.Info)
+            return -3
+        
+        QgsMessageLog.logMessage('get most likely path', level=Qgis.Info)
+        vertices = self.hidden_model.findViterbiPath()
+        feedback.setProgress(int(current * total))
+        current += 1
+        if len(vertices) == 0:
+            QgsMessageLog.logMessage('Cannot get a most likely path. Try to change settings.', level=Qgis.Critical)
+            return -3
+        
+        QgsMessageLog.logMessage('get network path', level=Qgis.Info)
+        features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
+        feedback.setProgress(int(current * total))
+        current += 1
+        if features == -1:
+            QgsMessageLog.logMessage('Routing between the result points, i.e. candidates with the highest total probability, does not work.', level=Qgis.Critical)
+            return -5
+        
+        feature_sink.addFeatures(features)
+        feedback.setProgress(int(current * total))
+        current += 1
+        
+        return 0
+    
     def fillLayerComboBox(self, iface, combobox, geom_type):
         #first clear the combobox
         combobox.clear()
@@ -112,21 +177,29 @@ class MapMatcher:
         return None
     
     def setUp(self, line_layer, point_layer, point_attr, pb):
-        #init progressbar
-        pb.setValue(0)
-        pb.setMaximum(3)
-        QApplication.processEvents()
+        if type(line_layer) is str:
+            self.network = Network(self.getLayer(line_layer))
+        else:
+            self.network = Network(line_layer)
         
-        self.trajectory = Trajectory(self.getLayer(point_layer), point_attr)
-        pb.setValue(pb.value() + 1)
-        QApplication.processEvents()
         
-        self.network = Network(self.getLayer(line_layer))
-        pb.setValue(pb.value() + 1)
-        QApplication.processEvents()
+        if type(line_layer) is str:
+            self.trajectory = Trajectory(self.getLayer(point_layer), point_attr)
+        else:
+            self.trajectory = Trajectory(point_layer, point_attr)
         
         self.hidden_model = HiddenModel(self.trajectory, self.network)
-        pb.setValue(pb.value() + 1)
-        QApplication.processEvents()
+        self.hidden_model.pb = pb
     
+    def defineAttributes(self):
+        attributes = [QgsField('id', QVariant.Int),
+                      QgsField('total_probability_start', QVariant.Double),
+                      QgsField('total_probability_end', QVariant.Double),
+                      QgsField('emission_probability_start', QVariant.Double),
+                      QgsField('emission_probability_end', QVariant.Double),
+                      QgsField('transition_probability_start', QVariant.Double),
+                      QgsField('transition_probability_end', QVariant.Double),
+                      QgsField('observation_id_start', QVariant.Int),
+                      QgsField('observation_id_end', QVariant.Int)]
+        return attributes
     

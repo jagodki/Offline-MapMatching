@@ -25,6 +25,27 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 - during the processing the dialog will be deactived until the processing finished
 - information about the current processing step will be written to the QGIS-log and displayed above the progressbar
 - further information, e.g. detailed information about the algorithm, can be found under the next captions
+- the plugin can be started via the toolbox too
+- the plugin can be started via the processing framework directly in python too
+- example for the python command:
+```python
+processing.run('omm:match_trajectory', {'NETWORK': 'network_layer',
+                                        'TRAJECTORY': 'trajectory_layer',
+                                        'TRAJECTORY_ID': 'id',
+                                        'CRS': '25833',
+                                        'SIGMA': 50.0,
+                                        'MY': 0.0,
+                                        'MAX_SEARCH_DISTANCE': 120.0,
+                                        'OUTPUT': 'destination_in_filesystem'})
+```
+- the processing plugin returns a python dictionary, e.g.:
+```python
+{'OUTPUT': 'destination_in_filesystem',
+'ERROR_CODE': 0,
+'COMPUTATION_TIME': 123.45}
+```
+- the ERROR_CODE will be a negative number if an error occured during processing, otherwise it is equal 0
+- the processing plugin writes all messages, also errors, to the QGIS-log (like the GUI-plugin)
 
 ## Hints for usage
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
