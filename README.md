@@ -14,10 +14,23 @@ This plugin provides a statistical approach to solve the problem of offline map 
 Hidden Markov Models (HMM) and the Viterbi algorithm.
 
 ## Installation
+<tr>
+<td>
 <img src="screenshots/download_1.png" height="150">
+</td>
+</tr>
+<tr>
+<td>
 <img src="screenshots/download_2.png" height="250">
+</td>
+</tr>
+<tr>
+<td>
 <img src="screenshots/download_3.png" height="150">
+</td>
 <img src="screenshots/download_4.png" height="350">
+</td>
+</tr>
 
 ## Usage
 - just fill in all entries in the plugin and click the start button
