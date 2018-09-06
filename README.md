@@ -15,23 +15,16 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 
 ## Installation
 <table>
-<tr>
-<td>
-<img src="screenshots/download_1.png" height="150">
-</td>
-</tr>
-<tr>
-<td>
-<img src="screenshots/download_2.png" height="250">
-</td>
-</tr>
-<tr>
-<td>
-<img src="screenshots/download_3.png" height="150">
-</td>
-<img src="screenshots/download_4.png" height="350">
-</td>
-</tr>
+    <tr>
+        <td><img src="screenshots/download_1.png" height="150"></td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/download_2.png" height="250"></td>
+    </tr>
+    <tr>
+        <td><img src="screenshots/download_3.png" height="150"></td>
+        <td><img src="screenshots/download_4.png" height="350"></td>
+        </tr>
 </table>
 
 ## Usage
