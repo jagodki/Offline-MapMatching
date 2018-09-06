@@ -17,6 +17,7 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 <img src="screenshots/download_1.png" height="150">
 <img src="screenshots/download_2.png" height="250">
 <img src="screenshots/download_3.png" height="150">
+<img src="screenshots/download_4.png" height="350">
 
 ## Usage
 - just fill in all entries in the plugin and click the start button
