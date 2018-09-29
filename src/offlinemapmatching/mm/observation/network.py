@@ -25,6 +25,7 @@ class Network:
             return -1
         else:
             points = {}
+            points = []
             cur_pos = end_id
             
             while cur_pos != start_id:
@@ -33,6 +34,9 @@ class Network:
                 from_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point()
                 to_vertex_id = str(graph.edge(tree[cur_pos]).toVertex())
                 to_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point()
+                
+                #check the  direction of the edge and just insert nodes, that do not already exist in the list
+                
                 
                 #add the extracted information to the dictionary
                 points.update({from_vertex_id : from_vertex_point})
