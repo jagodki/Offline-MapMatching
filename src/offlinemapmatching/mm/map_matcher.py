@@ -16,55 +16,55 @@ class MapMatcher:
     def startViterbiMatchingGui(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
         check_results = 0
         
-        label.setText('initialise data structur')
-        QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
+        label.setText('initialise data structur...')
+        QgsMessageLog.logMessage('initialise data structur...', level=Qgis.Info)
         self.setUp(network_name, trajectory_name, attribute_name, pb)
         
-        label.setText('create candidate graph')
-        QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
+        label.setText('create candidate graph...')
+        QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
         check_results = self.hidden_model.createGraph(sigma, my, max_dist)
         if check_results != 0:
-            label.setText('cannot create candidate graph')
-            QgsMessageLog.logMessage('cannot create candidate graph', level=Qgis.Info)
+            label.setText('cannot create candidate graph...')
+            QgsMessageLog.logMessage('cannot create candidate graph...', level=Qgis.Info)
             return -1
         
-        label.setText('calculate starting probabilities')
-        QgsMessageLog.logMessage('calculate starting probabilities', level=Qgis.Info)
+        label.setText('calculate starting probabilities...')
+        QgsMessageLog.logMessage('calculate starting probabilities...', level=Qgis.Info)
         check_results = self.hidden_model.setStartingProbabilities()
         if check_results != 0:
-            label.setText('cannot calculate starting probabilities')
-            QgsMessageLog.logMessage('cannot calculate starting probabilities', level=Qgis.Info)
+            label.setText('cannot calculate starting probabilities...')
+            QgsMessageLog.logMessage('cannot calculate starting probabilities...', level=Qgis.Info)
             return -3
         
         
-        label.setText('calculate transition probabilities')
-        QgsMessageLog.logMessage('calculate transition probabilities', level=Qgis.Info)
+        label.setText('calculate transition probabilities...')
+        QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
         check_results = self.hidden_model.setTransitionProbabilities()
         if check_results != 0:
-            label.setText('cannot calculate transition probabilities')
-            QgsMessageLog.logMessage('cannot calculate transition probabilities', level=Qgis.Info)
+            label.setText('cannot calculate transition probabilities...')
+            QgsMessageLog.logMessage('cannot calculate transition probabilities...', level=Qgis.Info)
             return -3
         
         
-        label.setText('create backtracking')
-        QgsMessageLog.logMessage('create backtracking', level=Qgis.Info)
+        label.setText('create backtracking...')
+        QgsMessageLog.logMessage('create backtracking...', level=Qgis.Info)
         check_results = self.hidden_model.createBacktracking()
         if check_results != 0:
-            label.setText('cannot create backtracking')
-            QgsMessageLog.logMessage('cannot create backtracking', level=Qgis.Info)
+            label.setText('cannot create backtracking...')
+            QgsMessageLog.logMessage('cannot create backtracking...', level=Qgis.Info)
             return -3
         
         
-        label.setText('get most likely path')
-        QgsMessageLog.logMessage('get most likely path', level=Qgis.Info)
+        label.setText('get most likely path...')
+        QgsMessageLog.logMessage('get most likely path...', level=Qgis.Info)
         vertices = self.hidden_model.findViterbiPath()
         if len(vertices) == 0:
             QgsMessageLog.logMessage('Cannot get a most likely path. Try to change settings.', level=Qgis.Critical)
             label.setText('cannot get path')
             return -3
         
-        label.setText('get network path')
-        QgsMessageLog.logMessage('get network path', level=Qgis.Info)
+        label.setText('get network path...')
+        QgsMessageLog.logMessage('get network path...', level=Qgis.Info)
         features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
         if features == -1:
             label.setText('cannot map trajectory')
@@ -84,12 +84,12 @@ class MapMatcher:
         total = 100.0 / 8
         current = 1
         
-        QgsMessageLog.logMessage('initialise data structur', level=Qgis.Info)
+        QgsMessageLog.logMessage('initialise data structur...', level=Qgis.Info)
         self.setUp(network_name, trajectory_name, attribute_name, None)
         feedback.setProgress(int(current * total))
         current += 1
         
-        QgsMessageLog.logMessage('create candidate graph', level=Qgis.Info)
+        QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
         check_results = self.hidden_model.createGraph(sigma, my, max_dist)
         feedback.setProgress(int(current * total))
         current += 1
@@ -97,7 +97,7 @@ class MapMatcher:
             QgsMessageLog.logMessage('cannot create candidate graph', level=Qgis.Info)
             return -1
         
-        QgsMessageLog.logMessage('calculate starting probabilities', level=Qgis.Info)
+        QgsMessageLog.logMessage('calculate starting probabilities...', level=Qgis.Info)
         check_results = self.hidden_model.setStartingProbabilities()
         feedback.setProgress(int(current * total))
         current += 1
@@ -106,7 +106,7 @@ class MapMatcher:
             return -3
         
         
-        QgsMessageLog.logMessage('calculate transition probabilities', level=Qgis.Info)
+        QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
         check_results = self.hidden_model.setTransitionProbabilities()
         feedback.setProgress(int(current * total))
         current += 1
@@ -114,7 +114,7 @@ class MapMatcher:
             QgsMessageLog.logMessage('cannot calculate transition probabilities', level=Qgis.Info)
             return -3
         
-        QgsMessageLog.logMessage('create backtracking', level=Qgis.Info)
+        QgsMessageLog.logMessage('create backtracking...', level=Qgis.Info)
         check_results = self.hidden_model.createBacktracking()
         feedback.setProgress(int(current * total))
         current += 1
@@ -122,7 +122,7 @@ class MapMatcher:
             QgsMessageLog.logMessage('cannot create backtracking', level=Qgis.Info)
             return -3
         
-        QgsMessageLog.logMessage('get most likely path', level=Qgis.Info)
+        QgsMessageLog.logMessage('get most likely path...', level=Qgis.Info)
         vertices = self.hidden_model.findViterbiPath()
         feedback.setProgress(int(current * total))
         current += 1
@@ -130,7 +130,7 @@ class MapMatcher:
             QgsMessageLog.logMessage('Cannot get a most likely path. Try to change settings.', level=Qgis.Critical)
             return -3
         
-        QgsMessageLog.logMessage('get network path', level=Qgis.Info)
+        QgsMessageLog.logMessage('get network path...', level=Qgis.Info)
         features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
         feedback.setProgress(int(current * total))
         current += 1

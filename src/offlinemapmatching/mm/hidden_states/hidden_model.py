@@ -54,10 +54,10 @@ class HiddenModel:
             
             #update progressbar
             self.updateProgressbar()
-            
+        
         return 0
     
-    def getTrellisEntryById(self, id, level):
+    def getCandidateById(self, id, level):
         for entry in self.candidate_graph[level]:
             if entry.get('id') == id:
                 return entry
@@ -77,7 +77,7 @@ class HiddenModel:
                     #get all transition probabilities of the current entry and iterate over them to find the highest total probability
                     transition_probabilities = entry.get('transition_probabilities')
                     for key in transition_probabilities:
-                        current_total_probability = transition_probabilities.get(key) * entry.get('emitted_probability') * self.getTrellisEntryById(key, i - 1).get('total_probability')
+                        current_total_probability = transition_probabilities.get(key) * entry.get('emitted_probability') * self.getCandidateById(key, i - 1).get('total_probability')
                         if current_total_probability > entry.get('total_probability'):
                             entry.update({'total_probability' : current_total_probability})
                             entry.update({'transition_probability' : transition_probabilities.get(key)})
@@ -103,22 +103,23 @@ class HiddenModel:
                 id = entry.get('id')
         
         #add the last vertex of the path
+        last_candidate = self.getCandidateById(id, trellis_counter)
         viterbi_path.insert(0, {'vertex': self.candidates.get(id),
                                 'total_probability': highest_prob,
-                                'emitted_probability': self.getTrellisEntryById(id, trellis_counter).get('emitted_probability'),
-                                'transition_probability': self.getTrellisEntryById(id, trellis_counter).get('transition_probability'),
-                                'observation_id': trellis_counter})
+                                'emitted_probability': last_candidate.get('emitted_probability'),
+                                'transition_probability': last_candidate.get('transition_probability'),
+                                'observation_id': last_candidate.get('observation_id')})
         
         #now find all parents of this vertex/candidate
         trellis_counter -= 1
         current_id = self.candidates_backtracking.get(id)
         while(current_id is not None and trellis_counter >= 0):
-            searched_candidate = self.getTrellisEntryById(current_id, trellis_counter)
+            searched_candidate = self.getCandidateById(current_id, trellis_counter)
             viterbi_path.insert(0, {'vertex': self.candidates.get(current_id),
                                     'total_probability': searched_candidate.get('total_probability'),
                                     'emitted_probability': searched_candidate.get('emitted_probability'),
                                     'transition_probability': searched_candidate.get('transition_probability'),
-                                    'observation_id': trellis_counter})
+                                    'observation_id': searched_candidate.get('observation_id')})
             current_id = self.candidates_backtracking.get(current_id)
             trellis_counter -= 1
         
