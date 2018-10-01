@@ -63,8 +63,10 @@ and the more computation time is needed
 
 ## Hints for developement
 - the plugin was created using the QGIS-plugin "plugin builder"
-- all additional python files were created in the
+- additional python files related to the Hidden Markov Model and the Viterbi algorithm can be found in the
 <a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm">mm</a>-folder
+- additional python files related to processing framework can be found in the 
+<a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm-processing">mm</a>-folder
 
 ## Description of the computation
 First the plugin calculates possible candidate points for each observation point in the trajectory (Budig 2012: 10).
