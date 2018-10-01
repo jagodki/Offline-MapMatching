@@ -24,7 +24,7 @@ repository=https://github.com/jagodki/Offline-MapMatching
 
 # Uncomment the following line and add your changelog:
 changelog=
-	1.1.1 - solve bugs according to the case of different directions of the network and the trajectory
+	1.1.1 - bugs according to the case of different directions of the network and the trajectory have been solved
 	1.1.0 - make the plugin accessible via the processing framework
 	1.0.3 - enable the usage of layers with geometries containing Z- and/or M-value
 	1.0.2 - edit metadata and improve exception handling
