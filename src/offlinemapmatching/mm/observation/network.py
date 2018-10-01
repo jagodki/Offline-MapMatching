@@ -24,33 +24,41 @@ class Network:
         if tree[end_id] == -1:
             return -1
         else:
-            points = {}
+            points = []
             cur_pos = end_id
             
-            while cur_pos != start_id:
-                #extract the indices and points of the current edge
-                from_vertex_id = str(graph.edge(tree[cur_pos]).fromVertex())
-                from_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point()
-                to_vertex_id = str(graph.edge(tree[cur_pos]).toVertex())
-                to_vertex_point = graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point()
-                
-                #add the extracted information to the dictionary
-                points.update({from_vertex_id : from_vertex_point})
-                points.update({to_vertex_id : to_vertex_point})
-                
-                #set the cur_pos for the next loop
-                if cur_pos != graph.edge(tree[cur_pos]).toVertex():
-                    cur_pos = graph.edge(tree[cur_pos]).toVertex()
-                else:
+            #get the first vertex
+            if cur_pos != start_id:
+                if cur_pos == graph.edge(tree[cur_pos]).toVertex():
+                    #insert the vertices to the result list
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point())
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point())
+                    
+                    #set cur_pos to the next vertex
                     cur_pos = graph.edge(tree[cur_pos]).fromVertex()
-        
-            #switch the first two points of the dictionary if necessary
-            list_of_vertices = list(points.values())
-            if end.x() == list_of_vertices[1].x() and end.y() == list_of_vertices[1].y():
-                list_of_vertices.insert(0, list_of_vertices.pop(1))
+                else:
+                    #insert the vertices to the result list
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point())
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point())
+                    
+                    #set cur_pos to the next vertex
+                    cur_pos = graph.edge(tree[cur_pos]).toVertex()
+                    
             
-            #return the values of the dictionary only
-            return list_of_vertices
+            while cur_pos != start_id:
+                #just insert the vertex of the current edge, which does not already exist in the result list
+                if cur_pos == graph.edge(tree[cur_pos]).toVertex():
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).fromVertex()).point())
+                    
+                    #set cur_pos to the next vertex
+                    cur_pos = graph.edge(tree[cur_pos]).fromVertex()
+                else:
+                    points.insert(0, graph.vertex(graph.edge(tree[cur_pos]).toVertex()).point())
+                    
+                    #set cur_pos to the next vertex
+                    cur_pos = graph.edge(tree[cur_pos]).toVertex()
+                
+            return points
     
     def distanceOnNetwork(self, start, end):
         #get all vertices from the routing result
