@@ -154,8 +154,10 @@ class MapMatcher:
         
         #populate the combobox
         for layer in self.layers:
-            if (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.Point and geom_type == 'POINT') or (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString and geom_type == 'LINESTRING'):
-                combobox.addItem(layer.name())
+            #ignore raster layer, because just vector layers have a wkbType
+            if layer.type() == 0:
+                if (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.Point and geom_type == 'POINT') or (QgsWkbTypes.flatType(layer.wkbType()) == QgsWkbTypes.LineString and geom_type == 'LINESTRING'):
+                    combobox.addItem(layer.name())
     
     def fillAttributeComboBox(self, combobox, layername):
         #first clear the combobox
