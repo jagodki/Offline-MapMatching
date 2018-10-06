@@ -10,7 +10,7 @@
 name=Offline-MapMatching
 qgisMinimumVersion=3.0
 description=a QGIS-plugin for matching a trajectory with a network using a Hidden Markov Model and Viterbi algorithm 
-version=1.1.2
+version=1.2.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
 
@@ -24,6 +24,7 @@ repository=https://github.com/jagodki/Offline-MapMatching
 
 # Uncomment the following line and add your changelog:
 changelog=
+	1.2.0 - new calculation for the direction probability to avoid u-turns
 	1.1.2 - the plugin will not crash anymore, if a raster layer is loaded
 	1.1.1 - bugs according to the case of different directions of the network and the trajectory have been solved
 	1.1.0 - make the plugin accessible via the processing framework

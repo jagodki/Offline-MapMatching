@@ -77,7 +77,7 @@ class HiddenModel:
                     
                     #get all transition probabilities of the current entry and iterate over them to find the highest total probability
                     transition_probabilities = entry.get('transition_probabilities')
-                    for key, value in transition_probabilities:
+                    for key, value in transition_probabilities.items():
                         current_total_probability = value * entry.get('emitted_probability') * self.getCandidateById(key, i - 1).get('total_probability')
                         if current_total_probability > entry.get('total_probability'):
                             entry.update({'total_probability' : current_total_probability})
@@ -89,12 +89,12 @@ class HiddenModel:
         
         return 0
     
-    def setCurvatureProbability(self):
-        #iterate over all candidates
-        for i, current_candidate in self.candidate_graph:
-            if 0 < i < len(self.candidate_graph):
-    
-    
+#    def setCurvatureProbability(self):
+#        #iterate over all candidates
+#        for i, current_candidate in self.candidate_graph:
+#            if 0 < i < len(self.candidate_graph):
+#
+
     def findViterbiPath(self):
         #init an array to store all candidates of the most likely path
         viterbi_path = []
@@ -155,11 +155,11 @@ class HiddenModel:
                         
                         #just continue, if both candidates do not have the same position, otherwise probability is equal zero
                         if self.checkPositionsOfTwoCandidates(current_candidate, previous_candidate):
-                            transition = Transition(previous_candidate, current_candidate)
+                            transition = Transition(previous_candidate, current_candidate, self.network)
                             
                             #calculate the probabilities of the transition
                             transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
-                            transition.setRoutingProbability(self.network, observation.point.distance(self.trajectory.observations[i - 1].point))
+                            transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point))
                             transition.setTransitionProbability()
                             
                             #insert the probability into the graph
