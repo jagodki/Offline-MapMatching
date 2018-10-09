@@ -39,7 +39,7 @@ class MapMatcher:
         
         label.setText('calculate transition probabilities...')
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities()
+        check_results = self.hidden_model.setTransitionProbabilities(45.0)
         if check_results != 0:
             label.setText('cannot calculate transition probabilities...')
             QgsMessageLog.logMessage('cannot calculate transition probabilities...', level=Qgis.Info)
@@ -107,7 +107,7 @@ class MapMatcher:
         
         
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities()
+        check_results = self.hidden_model.setTransitionProbabilities(45.0)
         feedback.setProgress(int(current * total))
         current += 1
         if check_results != 0:
