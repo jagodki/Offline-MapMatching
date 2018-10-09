@@ -132,7 +132,7 @@ class HiddenModel:
         
         return viterbi_path
     
-    def setTransitionProbabilities(self):
+    def setTransitionProbabilities(self, beta):
         #init progressbar
         self.initProgressbar(len(self.trajectory.observations))
         
@@ -159,7 +159,7 @@ class HiddenModel:
                             
                             #calculate the probabilities of the transition
                             transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
-                            transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point))
+                            transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
                             transition.setTransitionProbability()
                             
                             #insert the probability into the graph
