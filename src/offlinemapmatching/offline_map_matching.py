@@ -230,6 +230,7 @@ class OfflineMapMatching:
         self.dlg.progressBar.setValue(0)
         self.dlg.doubleSpinBox_sigma.setValue(50.0)
         self.dlg.doubleSpinBox_my.setValue(0.0)
+        self.dlg.doubleSpinBox_beta.setValue(30.0)
         self.dlg.doubleSpinBox_max.setValue(0.0)
         self.dlg.label_info.setText('')
         self.dlg.lineEdit_crs.setText('')
@@ -270,6 +271,7 @@ class OfflineMapMatching:
                           self.dlg.comboBox_trajectoryID.currentText(),
                           self.dlg.doubleSpinBox_sigma.value(),
                           self.dlg.doubleSpinBox_my.value(),
+                          self.dlg.doubleSpinBox_beta.value(),
                           self.dlg.doubleSpinBox_max.value(),
                           self.dlg.label_info,
                           self.dlg.lineEdit_crs.text())
