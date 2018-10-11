@@ -273,6 +273,7 @@
   <tabstop>lineEdit_crs</tabstop>
   <tabstop>doubleSpinBox_sigma</tabstop>
   <tabstop>doubleSpinBox_my</tabstop>
+  <tabstop>doubleSpinBox_beta</tabstop>
   <tabstop>doubleSpinBox_max</tabstop>
   <tabstop>pushButton_start</tabstop>
   <tabstop>textBrowser_help</tabstop>

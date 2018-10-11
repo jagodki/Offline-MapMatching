@@ -195,13 +195,12 @@ class MapMatcher:
     
     def defineAttributes(self):
         attributes = [QgsField('id', QVariant.Int),
-                      QgsField('total_probability_start', QVariant.Double),
-                      QgsField('total_probability_end', QVariant.Double),
+                      QgsField('observation_id_start', QVariant.Int),
+                      QgsField('observation_id_end', QVariant.Int),
                       QgsField('emission_probability_start', QVariant.Double),
                       QgsField('emission_probability_end', QVariant.Double),
-                      QgsField('transition_probability_start', QVariant.Double),
-                      QgsField('transition_probability_end', QVariant.Double),
-                      QgsField('observation_id_start', QVariant.Int),
-                      QgsField('observation_id_end', QVariant.Int)]
+                      QgsField('transition_probability', QVariant.Double),
+                      QgsField('total_probability_start', QVariant.Double),
+                      QgsField('total_probability_end', QVariant.Double)]
         return attributes
     
