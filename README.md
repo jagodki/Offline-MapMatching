@@ -116,8 +116,10 @@ probabilities in the HMM and represent another part of the five tupel (Raymond e
 The expected value and the standard deviation can be set by the user. The expected value represents the best possible or expected distance between
 a candidate and an observer. In most cases, this should be a value of zero (Newson, Krumm 2009: 3).
 If the standard deviation of the GNSS-receiver is unknown, it has to be estimated e.g. with this equation (Newson, Krumm 2009: 6):
+<br>
 <img src="screenshots/estimator_1.png" />
-I reached good results to set the standard deviation to around 1.5 * (maximum search distance). A larger value represents less trust in the measurement.
+<br>
+The term (z - x) means the distance between an observation and its candidate. I reached good results to set the standard deviation to around 2 * (maximum search distance). A larger value represents less trust in the measurement.
 A too high or too low standard deviation can overemphasise or underemphasise the emission probability (compared to the transition
 probability) and maybe results in an incorrect map matching.
 
@@ -130,10 +132,14 @@ i.e. the edges of the graph. Two characteristics of the transition between two c
 <br>
 The difference between the euklidean distance of the two observations and the distance on the network of two correpsonding candidates can be described by
 an exponential probability distribution (Newson, Krumm 2009: 4):
+<br>
 <img src="screenshots/epd_chart.png" />
+<br>
 The distance on the network will be calculated using the analysis framework of QGIS and the Dijkstra algorithm with the distance between nodes as
 edge weight. The difference of the two distances will be used in the following equation, in which the parameter d is the difference of the distances (Newson, Krumm 2009: 4):
+<br>
 <img src="screenshots/epd.png" />
+<br>
 The parameter beta can be estimated as around 1.5 * (median of all distances) (Newson, Krumm 2009: 6). I get good results setting beta = 1.5 * (maximum search distance).
 A larger value of beta represents more tolerance of non-direct routes and vice-versa.
 <br>
