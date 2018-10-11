@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>684</width>
-    <height>456</height>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,7 +119,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_max">
             <property name="text">
              <string>Maximum Search Distance [m]:</string>
@@ -149,7 +149,7 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
+          <item row="4" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBox_max">
             <property name="maximum">
              <double>9900000000.989999771118164</double>
@@ -177,6 +177,23 @@
            <widget class="QLineEdit" name="lineEdit_crs">
             <property name="placeholderText">
              <string>e.g. 25833</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_beta">
+            <property name="text">
+             <string>Mean Difference [m]:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_beta">
+            <property name="value">
+             <double>30.000000000000000</double>
             </property>
            </widget>
           </item>
@@ -256,6 +273,7 @@
   <tabstop>lineEdit_crs</tabstop>
   <tabstop>doubleSpinBox_sigma</tabstop>
   <tabstop>doubleSpinBox_my</tabstop>
+  <tabstop>doubleSpinBox_beta</tabstop>
   <tabstop>doubleSpinBox_max</tabstop>
   <tabstop>pushButton_start</tabstop>
   <tabstop>textBrowser_help</tabstop>

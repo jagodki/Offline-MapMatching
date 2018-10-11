@@ -13,7 +13,7 @@ class MapMatcher:
         self.network = None
         self.trajectoy = None
     
-    def startViterbiMatchingGui(self, pb, trajectory_name, network_name, attribute_name, sigma, my, max_dist, label, crs):
+    def startViterbiMatchingGui(self, pb, trajectory_name, network_name, attribute_name, sigma, my, beta, max_dist, label, crs):
         check_results = 0
         
         label.setText('initialise data structur...')
@@ -39,7 +39,7 @@ class MapMatcher:
         
         label.setText('calculate transition probabilities...')
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities(45.0)
+        check_results = self.hidden_model.setTransitionProbabilities(beta)
         if check_results != 0:
             label.setText('cannot calculate transition probabilities...')
             QgsMessageLog.logMessage('cannot calculate transition probabilities...', level=Qgis.Info)
@@ -79,7 +79,7 @@ class MapMatcher:
         QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
         return 0
     
-    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, sigma, my, max_dist, feature_sink, feedback):
+    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, sigma, my, beta, max_dist, feature_sink, feedback):
         check_results = 0
         total = 100.0 / 8
         current = 1
@@ -107,7 +107,7 @@ class MapMatcher:
         
         
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities(45.0)
+        check_results = self.hidden_model.setTransitionProbabilities(beta)
         feedback.setProgress(int(current * total))
         current += 1
         if check_results != 0:
@@ -195,13 +195,12 @@ class MapMatcher:
     
     def defineAttributes(self):
         attributes = [QgsField('id', QVariant.Int),
-                      QgsField('total_probability_start', QVariant.Double),
-                      QgsField('total_probability_end', QVariant.Double),
+                      QgsField('observation_id_start', QVariant.Int),
+                      QgsField('observation_id_end', QVariant.Int),
                       QgsField('emission_probability_start', QVariant.Double),
                       QgsField('emission_probability_end', QVariant.Double),
-                      QgsField('transition_probability_start', QVariant.Double),
-                      QgsField('transition_probability_end', QVariant.Double),
-                      QgsField('observation_id_start', QVariant.Int),
-                      QgsField('observation_id_end', QVariant.Int)]
+                      QgsField('transition_probability', QVariant.Double),
+                      QgsField('total_probability_start', QVariant.Double),
+                      QgsField('total_probability_end', QVariant.Double)]
         return attributes
     
