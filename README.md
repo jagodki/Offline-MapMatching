@@ -206,7 +206,7 @@ and transition probability of the end vertex and the total probability of the pa
     <tr>
         <td>st. deviation = 50, max. search dist. = 20, mean difference = 30</td>
         <td>st. deviation = 50, max. search dist. = 20, mean difference = 35</td>
-        <td>st. deviation = 12, max. search dist. = 30, mean difference = 5</td>
+        <td>st. deviation = 60, max. search dist. = 50, mean difference = 30</td>
         <td></td>
     </tr>
 </table>
