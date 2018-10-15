@@ -144,8 +144,9 @@ The parameter beta can be estimated as around 1.5 * (median of all distances) (N
 A larger value of beta represents more tolerance of non-direct routes and vice-versa.
 <br>
 <br>
-The directions will be calculated using the slope of the two lines through both candidates respectively the observations.
-The angle is the arcustanges of the slope and will have a value between 0 and 180 (the python function atan is used and the
+The directions will be calculated using the slope of the line through both observations and the product of the
+slops of each subline, i.e. each line between two following vertices, of the shortest way from one candidate
+to the other candidate on the network. The angle is the arcustanges of the slope and will have a value between 0 and 180 (the python function atan is used and the
 result will be summed up by 90 to avoid negative values). The difference of this two angles will be normalised to receive
 a value between 0 and 1 (Budig 2012: 17):
 <img src="screenshots/direction.png" />
