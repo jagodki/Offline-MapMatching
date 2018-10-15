@@ -24,7 +24,7 @@ repository=https://github.com/jagodki/Offline-MapMatching
 
 # Uncomment the following line and add your changelog:
 changelog=
-	2.0.0 - lorem ipsum
+	2.0.0 - introduce a new parameter to avoid u-turns
 	1.1.3 - experimental version to avoid u-turns (preparation for the new major version)
 	1.1.2 - the plugin will not crash anymore, if a raster layer is loaded
 	1.1.1 - bugs according to the case of different directions of the network and the trajectory have been solved
