@@ -10,6 +10,7 @@ class Transition:
         self.direction_probability = 0.0
         self.routing_probability = 0.0
         self.transition_probability = 0.0
+        self.pointsOnNetwork = self.getAllPointsOnNetwork(network)
     
     def setDirectionProbability(self, start_observation, end_observation):
         #variables to store the slops
@@ -28,15 +29,12 @@ class Transition:
         elif end_observation.point.asPoint().y() != start_observation.point.asPoint().y():
             m_observation = 90.0
         
-        #get all vertices of the network between start and end candidate
-        points_on_network = self.network.routing(self.start_candidate.point.asPoint(), self.end_candidate.point.asPoint())
-        
         #iterate over all points and use their precursor to calculate directions
-        for i, current_point in enumerate(points_on_network):
+        for i, current_point in enumerate(self.pointsOnNetwork):
             if i != 0:
                 
                 #get the precursor of the current point
-                precursor = points_on_network[i - 1]
+                precursor = self.pointsOnNetwork[i - 1]
                 
                 #calculate the slope of the points using arctan (we get results between 0 and 180 degrees)
                 if (current_point.x() - precursor.x()) != 0:
@@ -59,8 +57,7 @@ class Transition:
     
     def setRoutingProbability(self, distance_between_observations, beta):
         #get the distance of the shortest path between the two candidates of the current transition
-        distance_on_network = self.network.distanceOnNetwork(self.start_candidate.point.asPoint(),
-                                                             self.end_candidate.point.asPoint())
+        distance_on_network = self.getLengthOfTransition()
         
         #calculate the difference between the distances of the observations and the candidates
         difference = abs(distance_on_network - distance_between_observations)
@@ -71,4 +68,22 @@ class Transition:
     def setTransitionProbability(self):
         self.transition_probability = self.direction_probability * self.routing_probability
     
+    def getAllPointsOnNetwork(self, network):
+        #get all points of the shortest path on the network from the start to the end of the transistion and store them
+        return network.routing(self.start_candidate.point.asPoint(), self.end_candidate.point.asPoint())
+    
+    def getLengthOfTransition(self):
+        #points == -1, if routing was not possible
+        if self.pointsOnNetwork == -1:
+            return self.pointsOnNetwork
+        else:
+            distance = 0
+            for i, vertex in enumerate(self.pointsOnNetwork):
+                
+                #get the distance between the current vertice and the next vertice
+                if len(self.pointsOnNetwork) > (i + 1):
+                    distance = distance + vertex.distance(self.pointsOnNetwork[i + 1].x(), self.pointsOnNetwork[i + 1].y())
+                else:
+                    return distance
+            return distance
     

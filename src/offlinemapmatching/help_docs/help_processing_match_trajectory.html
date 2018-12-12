@@ -8,15 +8,15 @@
         <p><font size=3 face="helvetica, arial">The combobox shows all fields of the chosen trajectory layer. The selected field will be added to the result features, so that the vertices of the result layer can be referred to the points of the trajectory.</font></p>
         <h4><font face="helvetica, arial">CRS of output layer (EPSG):</font></h4>
         <p><font size=3 face="helvetica, arial">Insert the EPSG code, which should be used for the result layer. It is recommended to insert the CRS of the network and trajectory layer (both layer should have the same CRS). It is also recommended to use a metric CRS.</font></p>
-        <h4><font face="helvetica, arial">Standard Deviation [m]:</font></h4>
-        <p><font size=3 face="helvetica, arial">The standard deviation of the distance between the positions from the trajectory and their possible positions on the network. It will be assumed, that the points of the trajectory and their possible positions are normal distributed. A larger value represents less trust in the measurement. Go to the <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for additonal information about this setting.</font></p>
-        <h4><font face="helvetica, arial">Expected Value [m]:</font></h4>
-        <p><font size=3 face="helvetica, arial">The expected distance between the positions from the trajectory and their possible positions on the network. It is recommended to choose the value 0, i.e. ideally, the trajectory points should be on the network, if the accuracy of the coordinates would be 100%.</font></p>
-        <h4><font face="helvetica, arial">Mean Difference [m]:</font></h4>
-        <p><font size=3 face="helvetica, arial">The mean difference between the distances of two following trajectory points and their corresponding points on the network. A larger value represents more tolerance of non-direct routes. Go to the <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for additonal information about this setting.</font></p>
         <h4><font face="helvetica, arial">Maximum Search Distance [m]:</font></h4>
         <p><font size=3 face="helvetica, arial">The maximum distance to find points on the network for each trajectory point. It is mandatory, that this value is greater oder equal than the highest shortest distance between all trajectory points and the whole network. This setting has a big influence on the computing time. Go to the
-        <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for further information about this setting.</font></p>
+            <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for further information about this setting.</font></p>
+        <h4><font face="helvetica, arial">Standard Deviation:</font></h4>
+        <p><font size=3 face="helvetica, arial">The standard deviation of the distance between the positions from the trajectory and their possible positions on the network. It will be assumed, that the points of the trajectory and their possible positions are normal distributed. A bigger value represents less trust in the measurement. Go to the <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for additonal information about this setting.</font></p>
+        <h4><font face="helvetica, arial">Expected Value:</font></h4>
+        <p><font size=3 face="helvetica, arial">The expected distance between the positions from the trajectory and their possible positions on the network. It is recommended to choose the value 0, i.e. ideally, the trajectory points should be on the network, if the accuracy of the coordinates would be 100%.</font></p>
+        <h4><font face="helvetica, arial">Transition Weight:</font></h4>
+        <p><font size=3 face="helvetica, arial">A weight for the calculation of the difference between the distances of two following trajectory points and their corresponding points on the network. A bigger value represents more tolerance of non-direct routes. Go to the <a href="https://github.com/jagodki/Offline-MapMatching">repository on GitHub</a> for additonal information about this setting.</font></p>
         <hr>
         <p><font size=3 face="helvetica, arial">A detailed description about the algorithm is provided in the <a href="https://github.com/jagodki/Offline-MapMatching">README document</a> of the project on GitHub.</font></p>
     </body>

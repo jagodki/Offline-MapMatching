@@ -115,8 +115,18 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         
         self.addParameter(
             QgsProcessingParameterNumber(
+                self.MAX_SEARCH_DISTANCE,
+                self.tr('Maximum Search Distance [m]'),
+                type=QgsProcessingParameterNumber.Double,
+                defaultValue=20.0,
+                minValue=0.0
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterNumber(
                 self.SIGMA,
-                self.tr('Standard Deviation [m]'),
+                self.tr('Standard Deviation'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=50.0,
                 minValue=0.0
@@ -126,7 +136,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.MY,
-                self.tr('Expected Value [m]'),
+                self.tr('Expected Value'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=0,
                 minValue=0.0
@@ -136,19 +146,9 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.BETA,
-                self.tr('Mean Difference between Distances [m]'),
+                self.tr('Mean Difference between Distances'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=30.0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.MAX_SEARCH_DISTANCE,
-                self.tr('Maximum Search Distance [m]'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=0,
                 minValue=0.0
             )
         )

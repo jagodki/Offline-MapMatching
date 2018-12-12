@@ -60,22 +60,5 @@ class Network:
                 
             return points
     
-    def distanceOnNetwork(self, start, end):
-        #get all vertices from the routing result
-        vertices = self.routing(start, end)
-        
-        #points == -1, if routing was not possible
-        if vertices == -1:
-            return vertices
-        else:
-            distance = 0
-            for i, vertex in enumerate(vertices):
-                
-                #get the distance between the current vertice and the next vertice
-                if len(vertices) > (i + 1):
-                    distance = distance + vertex.distance(vertices[i + 1].x(), vertices[i + 1].y())
-                else:
-                    return distance
-            return distance
     
 
