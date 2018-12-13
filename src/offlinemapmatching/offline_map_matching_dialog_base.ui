@@ -274,6 +274,7 @@
   <tabstop>comboBox_trajectory</tabstop>
   <tabstop>comboBox_trajectoryID</tabstop>
   <tabstop>lineEdit_crs</tabstop>
+  <tabstop>doubleSpinBox_max</tabstop>
   <tabstop>doubleSpinBox_sigma</tabstop>
   <tabstop>doubleSpinBox_my</tabstop>
   <tabstop>doubleSpinBox_beta</tabstop>

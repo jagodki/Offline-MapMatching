@@ -140,7 +140,7 @@ edge weight. The difference of the two distances will be used in the following e
 <br>
 <img src="screenshots/epd.png" />
 <br>
-The parameter beta can be estimated as around 1.5 * (median of all distances) (Newson, Krumm 2009: 6). I get good results setting beta = 1.5 * (maximum search distance).
+The parameter beta (named "Transition weight" in the GUI of the plugin) can be estimated as around 1.5 * (median of all distances) (Newson, Krumm 2009: 6). I get good results setting beta = 1.5 * (maximum search distance).
 A larger value of beta represents more tolerance of non-direct routes and vice-versa.
 <br>
 <br>
@@ -225,7 +225,7 @@ Retrieved Jul 31, 2018 from
 Raymond, R., Morimura, T., Osogami, T., Hirosue, N. (2012). <i>Map Matching with Hidden Markov Model on Sampled Road Network</i>. 
 21st International Conference on Pattern Recognition (ICPR 2012). 
 Retrieved Jul 31, 2018 from 
-<a href="http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf">http://f4k.dieei.unict.it/proceedings/ICPR2012/media/files/2224.pdf</a>
+<a href="https://www.computer.org/csdl/proceedings/icpr/2012/2216/00/06460610.pdf">https://www.computer.org/csdl/proceedings/icpr/2012/2216/00/06460610.pdf</a>
 <br><br>
 Haenelt, K. (2007). <i>Der Viterbi-Algorithmus. Eine Erl\ufffduterung der formalen Spezifikation am Beispiel des Part-of-Speech Tagging</i>. 
 Retrieved Jul 31, 2018 from 

@@ -146,7 +146,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.BETA,
-                self.tr('Mean Difference between Distances'),
+                self.tr('Transition Weight'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=30.0,
                 minValue=0.0
