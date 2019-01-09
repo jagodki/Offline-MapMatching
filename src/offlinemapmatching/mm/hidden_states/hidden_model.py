@@ -152,7 +152,7 @@ class HiddenModel:
                         
                         #calculate the probabilities of the transition
                         transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
-                     transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
+                        transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
                         transition.setTransitionProbability()
                         
                         #insert the probability into the graph
