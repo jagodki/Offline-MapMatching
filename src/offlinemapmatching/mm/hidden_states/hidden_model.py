@@ -148,20 +148,36 @@ class HiddenModel:
                         previous_candidate = self.candidates.get(previous_entry.get('id'))
                         
                         #create a new transition
-                        transition = Transition(previous_candidate, current_candidate, self.network)
+                        transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
                         
                         #calculate the probabilities of the transition
                         transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
                         transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
-                        transition.setTransitionProbability()
+                        result = transition.setTransitionProbability()
                         
                         #insert the probability into the graph
+                        if result == False: 
+                            return -1
+                        
                         current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
-                
+
             self.updateProgressbar()
             
         return 0
     
+    def candidatesHaveDifferentPositions(self, candidate_1, candidate_2):
+        #get coordinates of the previous entry and the current candidate
+        x_candidate_1 = candidate_1.point.asPoint().x()
+        y_candidate_1 = candidate_1.point.asPoint().y()
+        x_candidate_2 = candidate_2.point.asPoint().x()
+        y_candidate_2 = candidate_2.point.asPoint().y()
+                        
+        #if points are not equal, return True, otherwise False
+        if x_candidate_1 != x_candidate_2 or y_candidate_1 != y_candidate_2:
+            return True
+        else:
+            return False
+
     def setStartingProbabilities(self):
         first_tellis_level = self.candidate_graph[0]
         
@@ -211,6 +227,10 @@ class HiddenModel:
             
             #if we are in the first loop, we skip them because we have no previous point to create a routing with start and end
             if i != 0:
+                
+                #check, whether the two current candidates share the same position or not
+                if self.candidatesHaveDifferentPositions(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint()) == False:
+                    continue
                 
                 #get all edges of the graph/network along the shortest way from the previous to the current vertex
                 points = self.network.routing(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint())
