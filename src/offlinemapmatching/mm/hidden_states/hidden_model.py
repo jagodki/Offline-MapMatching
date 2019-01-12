@@ -229,7 +229,8 @@ class HiddenModel:
             if i != 0:
                 
                 #check, whether the two current candidates share the same position or not
-                if self.candidatesHaveDifferentPositions(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint()) == False:
+                if self.candidatesHaveDifferentPositions(vertices[i - 1]['vertex'], vertex['vertex']) == False:
+                    self.updateProgressbar()
                     continue
                 
                 #get all edges of the graph/network along the shortest way from the previous to the current vertex
