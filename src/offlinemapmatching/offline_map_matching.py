@@ -279,11 +279,17 @@ class OfflineMapMatching:
             if result == 0:
                 self.iface.messageBar().pushMessage('map matching finished ^o^ - time: ' + str(round(time.time() - start_time, 2)) + ' sec', level=Qgis.Success, duration=60)
             elif result == -1:
-                self.iface.messageBar().pushMessage('The maximum search distance seems too low to find candidates for at least one position.', level=Qgis.Warning, duration=60)
+                self.iface.messageBar().pushMessage('Error during calculation of candidates. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
+            elif result == -2:
+                self.iface.messageBar().pushMessage('Error during calculation of starting probabilities. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
             elif result == -3:
-                self.iface.messageBar().pushMessage('Something went wrong with the Hidden Markov Model. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
+                self.iface.messageBar().pushMessage('Error during calculation of transition probabilities. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
+            elif result == -4:
+                self.iface.messageBar().pushMessage('Error during calculation of backtracking. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
             elif result == -5:
-                self.iface.messageBar().pushMessage('Routing between the result points, i.e. candidates with the highest probability, does not work.', level=Qgis.Warning, duration=60)
+                self.iface.messageBar().pushMessage('Error during calculating the most likely path. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
+            elif result == -6:
+                self.iface.messageBar().pushMessage('Error during calculating the path on network. Check the QGIS-log for further information.', level=Qgis.Warning, duration=60)
     
         except:
             QgsMessageLog.logMessage(traceback.format_exc(), level=Qgis.Critical)

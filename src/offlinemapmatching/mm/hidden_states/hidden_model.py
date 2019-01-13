@@ -88,12 +88,6 @@ class HiddenModel:
             self.updateProgressbar()
         
         return 0
-    
-#    def setCurvatureProbability(self):
-#        #iterate over all candidates
-#        for i, current_candidate in self.candidate_graph:
-#            if 0 < i < len(self.candidate_graph):
-#
 
     def findViterbiPath(self):
         #init an array to store all candidates of the most likely path
@@ -153,23 +147,25 @@ class HiddenModel:
                         current_candidate = self.candidates.get(current_entry.get('id'))
                         previous_candidate = self.candidates.get(previous_entry.get('id'))
                         
-                        #just continue, if both candidates do not have the same position, otherwise probability is equal zero
-                        if self.checkPositionsOfTwoCandidates(current_candidate, previous_candidate):
-                            transition = Transition(previous_candidate, current_candidate, self.network)
-                            
-                            #calculate the probabilities of the transition
-                            transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
-                            transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
-                            transition.setTransitionProbability()
-                            
-                            #insert the probability into the graph
-                            current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
-                
+                        #create a new transition
+                        transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
+                        
+                        #calculate the probabilities of the transition
+                        transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
+                        transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
+                        result = transition.setTransitionProbability()
+                        
+                        #insert the probability into the graph
+                        if result == False: 
+                            return -1
+                        
+                        current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
+
             self.updateProgressbar()
             
         return 0
     
-    def checkPositionsOfTwoCandidates(self, candidate_1, candidate_2):
+    def candidatesHaveDifferentPositions(self, candidate_1, candidate_2):
         #get coordinates of the previous entry and the current candidate
         x_candidate_1 = candidate_1.point.asPoint().x()
         y_candidate_1 = candidate_1.point.asPoint().y()
@@ -177,11 +173,11 @@ class HiddenModel:
         y_candidate_2 = candidate_2.point.asPoint().y()
                         
         #if points are not equal, return True, otherwise False
-        if x_candidate_1 != x_candidate_2 and y_candidate_1 != y_candidate_2:
+        if x_candidate_1 != x_candidate_2 or y_candidate_1 != y_candidate_2:
             return True
         else:
             return False
-    
+
     def setStartingProbabilities(self):
         first_tellis_level = self.candidate_graph[0]
         
@@ -231,6 +227,11 @@ class HiddenModel:
             
             #if we are in the first loop, we skip them because we have no previous point to create a routing with start and end
             if i != 0:
+                
+                #check, whether the two current candidates share the same position or not
+                if self.candidatesHaveDifferentPositions(vertices[i - 1]['vertex'], vertex['vertex']) == False:
+                    self.updateProgressbar()
+                    continue
                 
                 #get all edges of the graph/network along the shortest way from the previous to the current vertex
                 points = self.network.routing(vertices[i - 1]['vertex'].point.asPoint(), vertex['vertex'].point.asPoint())
