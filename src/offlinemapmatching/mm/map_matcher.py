@@ -25,7 +25,7 @@ class MapMatcher:
         check_results = self.hidden_model.createGraph(sigma, my, max_dist)
         if check_results != 0:
             label.setText('error during calculation of candidates...')
-            QgsMessageLog.logMessage('the maximum search distance is too low for one trajectory point point to find at least one candidate', level=Qgis.Info)
+            QgsMessageLog.logMessage('the maximum search distance is too low for one trajectory point to find at least one candidate', level=Qgis.Info)
             return -1
         
         label.setText('calculate starting probabilities...')
