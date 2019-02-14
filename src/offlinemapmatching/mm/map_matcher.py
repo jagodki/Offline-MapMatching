@@ -11,7 +11,7 @@ class MapMatcher:
         self.attributes = []
         self.hidden_model = None
         self.network = None
-        self.trajectoy = None
+        self.trajectory = None
     
     def startViterbiMatchingGui(self, pb, trajectory_name, network_name, attribute_name, sigma, my, beta, max_dist, label, crs):
         check_results = 0
