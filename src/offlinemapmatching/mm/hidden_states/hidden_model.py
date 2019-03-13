@@ -80,7 +80,7 @@ class HiddenModel:
                     transition_probabilities = entry.get('transition_probabilities')
                     for key, value in transition_probabilities.items():
                         current_total_probability = value * entry.get('emitted_probability') * self.getCandidateById(key, i - 1).get('total_probability')
-                        if current_total_probability > entry.get('total_probability'):
+                        if current_total_probability >= entry.get('total_probability'):
                             entry.update({'total_probability' : current_total_probability})
                             entry.update({'transition_probability' : value})
                             self.candidates_backtracking.update({entry.get('id') : key})
