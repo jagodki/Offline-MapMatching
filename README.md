@@ -212,6 +212,10 @@ and transition probability of the end vertex and the total probability of the pa
     </tr>
 </table>
 
+## Further Description
+More information about the calculations can be found in the following paper (in german language with an english abstract):<br>
+<a href="https://gispoint.de/fileadmin/user_upload/paper_gis_open/AGIT_2019/537669014.pdf">Jung, C. (2019): Offline-MapMatching – A QGIS Plugin for Matching a Trajectory with a Network. In: <i>AGIT ‒ Journal für Angewandte Geoinformatik 5-2019</i> (pp. 156-163). Berlin/Offenbach: Wichmann Verlag. doi: 10.14627/537669014</a>
+
 ## Sources
 Newson, P., & Krumm, J. (2009). <i>Hidden Markov map matching through noise and sparseness.</i>
 In Proceedings of the 17th ACM SIGSPATIAL international conference on advances in geographic information systems (pp. 336-343). ACM. 
