@@ -55,6 +55,9 @@ class Transition:
     
         #store the result
         self.direction_probability = p_intermediate
+        
+        if self.points_on_network == -1:
+            self.direction_probability = None
     
     def setRoutingProbability(self, distance_between_observations, beta):
         #get the distance of the shortest path between the two candidates of the current transition
