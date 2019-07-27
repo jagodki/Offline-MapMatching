@@ -52,12 +52,10 @@ class Transition:
                     
                     #clear the slope
                     m_candidate = 0.0
-    
-        #store the result
-        self.direction_probability = p_intermediate
         
-        if self.points_on_network == -1:
-            self.direction_probability = None
+        #store the result
+        if self.points_on_network != -1:
+            self.direction_probability = p_intermediate
     
     def setRoutingProbability(self, distance_between_observations, beta):
         #get the distance of the shortest path between the two candidates of the current transition
@@ -67,17 +65,16 @@ class Transition:
         difference = abs(distance_on_network - distance_between_observations)
 
         #calculate the exponential probability distribution
-        if distance_on_network == -1:
-            self.routing_probability = None
-        else:
+        if distance_on_network != -1:
             self.routing_probability = 1 / beta * math.pow(math.e, -1 * difference / beta)
     
     def setTransitionProbability(self):
-        if self.direction_probability != None and self.routing_probability != None:
-            self.transition_probability = self.direction_probability * self.routing_probability
-            return True
-        else:
-            return False
+        self.transition_probability = self.direction_probability * self.routing_probability
+        #if self.direction_probability != None and self.routing_probability != None:
+            #self.transition_probability = self.direction_probability * self.routing_probability
+            #return True
+        #else:
+            #return False
     
     def getAllpoints_on_network(self, network):
         #get all points of the shortest path on the network from the start to the end of the transistion and store them

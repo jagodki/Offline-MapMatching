@@ -154,12 +154,13 @@ class HiddenModel:
                         #calculate the probabilities of the transition
                         transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
                         transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
-                        result = transition.setTransitionProbability()
+                        transition.setTransitionProbability()
+                        
+                        #from v2.2.0 the calculation of the transition posibility does not return anything
+                        #if result == False:
+                            #return -1
                         
                         #insert the probability into the graph
-                        if result == False: 
-                            return -1
-                        
                         current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
 
             self.updateProgressbar()
