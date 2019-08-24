@@ -26,7 +26,7 @@ from PyQt5.QtGui import QIcon, QTextCursor
 from PyQt5.QtWidgets import QAction
 from qgis.gui import QgsMessageBar
 from qgis.core import *
-import time, traceback, sys, inspect
+import time, traceback, sys, inspect, processing
 
 # Initialize Qt resources from file resources.py
 from .resources import *
@@ -37,6 +37,8 @@ import os.path
 #import own classes
 from .mm.map_matcher import *
 from .mm_processing.offline_map_matching_provider import *
+#from .helper_files.helper import *
+
 '''
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0]
 
@@ -95,6 +97,7 @@ class OfflineMapMatching:
         #declare additional instance vars
         self.map_matcher = MapMatcher()
         self.provider = OfflineMapMatchingProvider()
+        #self.clipNetworkProvider = ClipNetworkProvider()
         
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
@@ -180,12 +183,12 @@ class OfflineMapMatching:
         if add_to_toolbar:
             self.toolbar.addAction(action)
 
-#        if add_to_menu:
-#            self.iface.addPluginToVectorMenu(
-#                self.menu,
-#                action)
+        if add_to_menu:
+            self.iface.addPluginToVectorMenu(
+                self.menu,
+                action)
 
-        self.iface.vectorMenu().addAction(action)
+#        self.iface.vectorMenu().addAction(action)
         
         self.actions.append(action)
 
@@ -194,16 +197,29 @@ class OfflineMapMatching:
     def initGui(self):
         '''Create the menu entries, toolbar icons inside the QGIS GUI and add a new processing provider.'''
         icon_path = ':/plugins/offline_map_matching/icon.png'
+        clipping_icon_path = ':/plugins/offline_map_matching/clipping_icon.png'
+        
+        #set up entry for the main gui
         self.add_action(
             icon_path,
             text=self.tr(u'Offline-MapMatching'),
             callback=self.run,
             parent=self.iface.mainWindow())
         
+        #set up the entry for the clipping routine
+        initial_params={}
+        self.add_action(
+            clipping_icon_path,
+            text=self.tr(u'Clip network with Trajectory'),
+            #callback=processing.execAlgorithmDialog('omm:clip_network', {})
+            callback=self.run
+            #parent=self.iface.mainWindow()
+        )
+        
         #add the processing provider
         QgsApplication.processingRegistry().addProvider(self.provider)
-
-
+        #QgsApplication.processingRegistry().addProvider(self.clipNetworkProvider)
+    
     def unload(self):
         '''Removes the plugin menu item and icon from QGIS GUI. Remove the processing provider.'''
         for action in self.actions:
@@ -233,7 +249,7 @@ class OfflineMapMatching:
         self.dlg.doubleSpinBox_beta.setValue(30.0)
         self.dlg.doubleSpinBox_max.setValue(0.0)
         self.dlg.label_info.setText('')
-        self.dlg.lineEdit_crs.setText('')
+        #self.dlg.lineEdit_crs.setText('')
         
         # show the dialog
         self.dlg.show()
@@ -274,7 +290,7 @@ class OfflineMapMatching:
                           self.dlg.doubleSpinBox_beta.value(),
                           self.dlg.doubleSpinBox_max.value(),
                           self.dlg.label_info,
-                          self.dlg.lineEdit_crs.text())
+                          self.dlg.mQgsProjectionSelectionWidget.crs().authid())
             
             if result == 0:
                 self.iface.messageBar().pushMessage('map matching finished ^o^ - time: ' + str(round(time.time() - start_time, 2)) + ' sec', level=Qgis.Success, duration=60)

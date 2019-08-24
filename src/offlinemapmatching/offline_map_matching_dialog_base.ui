@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>476</height>
+    <width>683</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -119,6 +119,23 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_my">
+            <property name="maximum">
+             <double>9900000000.989999771118164</double>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_beta">
+            <property name="text">
+             <string>Transition Weight:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="1">
            <widget class="QDoubleSpinBox" name="doubleSpinBox_sigma">
             <property name="maximum">
@@ -129,44 +146,26 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="doubleSpinBox_max">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximum">
+             <double>9900000000.989999771118164</double>
+            </property>
+            <property name="value">
+             <double>20.000000000000000</double>
+            </property>
+           </widget>
+          </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_sigma">
             <property name="text">
              <string>Standard Deviation:</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_my">
-            <property name="maximum">
-             <double>9900000000.989999771118164</double>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_crs">
-            <property name="text">
-             <string>CRS of output layer (EPSG):</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_crs">
-            <property name="placeholderText">
-             <string>e.g. 25833</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_beta">
-            <property name="text">
-             <string>Transition Weight:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -182,23 +181,32 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_max">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
-             <string>Maximum Search Distance [m]:</string>
+             <string>max. Search Distance [m]:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QDoubleSpinBox" name="doubleSpinBox_max">
-            <property name="maximum">
-             <double>9900000000.989999771118164</double>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_crs">
+            <property name="text">
+             <string>CRS of input layers:</string>
             </property>
-            <property name="value">
-             <double>20.000000000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
           </item>
          </layout>
         </item>
@@ -269,11 +277,17 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QgsProjectionSelectionWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsprojectionselectionwidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBox_network</tabstop>
   <tabstop>comboBox_trajectory</tabstop>
   <tabstop>comboBox_trajectoryID</tabstop>
-  <tabstop>lineEdit_crs</tabstop>
   <tabstop>doubleSpinBox_max</tabstop>
   <tabstop>doubleSpinBox_sigma</tabstop>
   <tabstop>doubleSpinBox_my</tabstop>
