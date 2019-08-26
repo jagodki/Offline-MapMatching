@@ -210,7 +210,7 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         '''Returns the text for the help widget, if a help document does exist.'''
         dir = os.path.dirname(__file__)
-        file = os.path.abspath(os.path.join(dir, '..', 'help_docs', 'help_clip.html'))
+        file = os.path.abspath(os.path.join(dir, '..', 'help_docs', 'help_processing_clipping_network.html'))
         if not os.path.exists(file):
             return ''
         with open(file) as helpf:
@@ -248,4 +248,4 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         return ClipNetworkAlgorithm()
 
     def icon(self):
-        return QIcon(':/plugins/offline_map_matching/clipping_icon.png')
+        return QIcon(':/plugins/Offline_MapMatching/clipping_icon.png')
