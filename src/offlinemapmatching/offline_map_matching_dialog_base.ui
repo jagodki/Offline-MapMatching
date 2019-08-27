@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>683</width>
+    <width>760</width>
     <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Offline-MapMatching</string>
+   <string>Matching Trajectory</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>

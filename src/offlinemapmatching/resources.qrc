@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/plugins/offline_map_matching" >
         <file>icon.png</file>
+        <file>clipping_icon.png</file>
     </qresource>
 </RCC>
