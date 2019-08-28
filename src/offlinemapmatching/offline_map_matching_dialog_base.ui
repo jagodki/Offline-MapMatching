@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>760</width>
+    <width>679</width>
     <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Matching Trajectory</string>
+   <string>Match Trajectory</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -206,7 +206,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget"/>
+           <widget class="QgsProjectionSelectionWidget" name="mQgsProjectionSelectionWidget" native="true"/>
           </item>
          </layout>
         </item>
@@ -265,6 +265,12 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QTextBrowser" name="textBrowser_help">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="readOnly">
         <bool>true</bool>
        </property>

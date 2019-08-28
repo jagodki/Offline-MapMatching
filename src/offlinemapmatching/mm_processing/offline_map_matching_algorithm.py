@@ -42,7 +42,8 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterNumber,
                        QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
-                       QgsFields)
+                       QgsFields,
+                       QgsProcessingParameterCrs)
 from ..mm.map_matcher import MapMatcher
 import time, os.path
 
@@ -107,9 +108,9 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         )
         
         self.addParameter(
-            QgsProcessingParameterString(
+            QgsProcessingParameterCrs(
                 self.CRS,
-                self.tr('CRS of the Output layer (EPSG)')
+                self.tr('CRS of the Output layer')
             )
         )
         
@@ -192,7 +193,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
             context
         )
         
-        crs = self.parameterAsString(
+        crs = self.parameterAsCrs(
             parameters,
             self.CRS,
             context
@@ -227,7 +228,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
             context,
             fields,
             QgsWkbTypes.LineString,
-            QgsCoordinateReferenceSystem('EPSG:' + crs)
+            crs
         )
         
         error_code = mm.startViterbiMatchingProcessing(trajectory_layer,

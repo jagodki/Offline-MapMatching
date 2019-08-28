@@ -39,7 +39,9 @@ from qgis.core import (QgsProcessing,
                        QgsProcessingParameterString,
                        QgsProcessingParameterNumber,
                        QgsCoordinateReferenceSystem,
-                       QgsProject)
+                       QgsProject,
+                       QgsProcessingParameterFeatureSink,
+                       QgsWkbTypes)
 import processing
 import time, os.path
 
@@ -66,6 +68,7 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
     TRAJECTORY = 'TRAJECTORY'
     ORDER_FIELD = 'ORDER_FIELD'
     BUFFER_RADIUS = 'BUFFER_RADIUS'
+    OUTPUT = 'OUTPUT'
 
     def initAlgorithm(self, config):
         '''
@@ -107,6 +110,13 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
                 minValue=0.0
             )
         )
+        
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT,
+                self.tr('Output layer')
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         '''
@@ -137,6 +147,15 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
             parameters,
             self.BUFFER_RADIUS,
             context
+        )
+        
+        (sink, dest_id) = self.parameterAsSink(
+            parameters,
+            self.OUTPUT,
+            context,
+            network_layer.fields(),
+            QgsWkbTypes.LineString,
+            network_layer.crs()
         )
         
         #init the progressbar
@@ -184,7 +203,8 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         feedback.setProgress(int((counter / max_count) * max_count))
         
         #add the result to the QGIS project
-        QgsProject.instance().addMapLayer(single_part_network['OUTPUT'])
+        sink.addFeatures(single_part_network['OUTPUT'].getFeatures())
+        #QgsProject.instance().addMapLayer(single_part_network['OUTPUT'])
         
         return {'Finished ^o^': str(round(time.time() - start_time, 2))}
 
@@ -249,4 +269,5 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         return ClipNetworkAlgorithm()
 
     def icon(self):
-        return QIcon(':/plugins/Offline_MapMatching/clipping_icon.png')
+        return QIcon(os.path.dirname(__file__) + './clipping_icon.png')
+        #return QIcon(':/plugins/Offline_MapMatching/clipping_icon.png')

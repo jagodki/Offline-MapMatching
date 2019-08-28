@@ -200,7 +200,7 @@ class OfflineMapMatching:
         #set up entry for the main gui
         self.add_action(
             icon_path,
-            text=self.tr(u'Matching Trajectory'),
+            text=self.tr(u'Match Trajectory'),
             callback=self.run,
             parent=self.iface.mainWindow())
         
