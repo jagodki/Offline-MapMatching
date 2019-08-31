@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/plugins/offline_map_matching" >
-        <file>icon.png</file>
-        <file>clipping_icon.png</file>
+        <file>icons/icon.png</file>
+        <file>icons/clipping_icon.png</file>
+        <file>icons/preprocessing_icon.png</file>
     </qresource>
 </RCC>

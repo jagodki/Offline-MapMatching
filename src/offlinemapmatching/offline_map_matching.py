@@ -195,7 +195,7 @@ class OfflineMapMatching:
 
     def initGui(self):
         '''Create the menu entries, toolbar icons inside the QGIS GUI and add a new processing provider.'''
-        icon_path = ':/plugins/offline_map_matching/icon.png'
+        icon_path = ':/plugins/offline_map_matching/icons/icon.png'
         
         #set up entry for the main gui
         self.add_action(
@@ -206,10 +206,11 @@ class OfflineMapMatching:
         
         #init the preprocessing group with their entries
         menu = QMenu()
-        icon = QIcon(os.path.dirname(__file__) + 'clipping_icon.png')
-        action = menu.addAction(icon, 'Clip Network', self.clipNetwork)
+        icon_clip = QIcon(':/plugins/offline_map_matching/icons/clipping_icon.png')
+        icon_pp = QIcon(':/plugins/offline_map_matching/icons/preprocessing_icon.png')
+        action = menu.addAction(icon_clip, 'Clip Network', self.clipNetwork)
         action.setObjectName('clip_network')
-        preprocessing_action = QAction(icon, 'Preprocessing', self.iface.mainWindow())
+        preprocessing_action = QAction(icon_pp, 'Preprocessing', self.iface.mainWindow())
         preprocessing_action.setMenu(menu)
         self.add_action(
             '',

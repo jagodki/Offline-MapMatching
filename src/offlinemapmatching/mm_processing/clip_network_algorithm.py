@@ -269,5 +269,4 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         return ClipNetworkAlgorithm()
 
     def icon(self):
-        return QIcon(os.path.dirname(__file__) + './clipping_icon.png')
-        #return QIcon(':/plugins/Offline_MapMatching/clipping_icon.png')
+        return QIcon(':/plugins/offline_map_matching/icons/clipping_icon.png')

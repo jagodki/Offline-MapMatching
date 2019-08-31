@@ -306,4 +306,4 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         return OfflineMapMatchingAlgorithm()
 
     def icon(self):
-        return QIcon(':/plugins/offline_map_matching/icon.png')
+        return QIcon(':/plugins/offline_map_matching/icons/icon.png')
