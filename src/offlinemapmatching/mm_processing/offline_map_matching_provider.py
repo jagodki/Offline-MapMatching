@@ -33,6 +33,7 @@ __revision__ = '$Format:%H$'
 from qgis.core import QgsProcessingProvider
 from PyQt5.QtGui import QIcon
 from .offline_map_matching_algorithm import OfflineMapMatchingAlgorithm
+from .clip_network_algorithm import ClipNetworkAlgorithm
 
 
 class OfflineMapMatchingProvider(QgsProcessingProvider):
@@ -41,7 +42,8 @@ class OfflineMapMatchingProvider(QgsProcessingProvider):
         QgsProcessingProvider.__init__(self)
 
         # Load algorithms
-        self.alglist = [OfflineMapMatchingAlgorithm()]
+        self.alglist = [OfflineMapMatchingAlgorithm(),
+                        ClipNetworkAlgorithm()]
 
     def unload(self):
         '''

@@ -195,7 +195,7 @@ class HiddenModel:
     
     def addFeaturesToLayer(self, features, attributes, crs):
         #create a new layer
-        layer = QgsVectorLayer('LineString?crs=EPSG:' + crs + '&index=yes', 'matched trajectory', 'memory')
+        layer = QgsVectorLayer('LineString?crs=' + crs + '&index=yes', 'matched trajectory', 'memory')
         
         #load the layer style
         dir = os.path.dirname(__file__)

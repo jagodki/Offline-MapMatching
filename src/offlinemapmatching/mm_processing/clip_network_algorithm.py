@@ -32,23 +32,21 @@ __revision__ = '$Format:%H$'
 from PyQt5.QtCore import QCoreApplication, QUrl
 from PyQt5.QtGui import QIcon
 from qgis.core import (QgsProcessing,
-                       QgsFeatureSink,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterFeatureSource,
-                       QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterVectorLayer,
                        QgsProcessingParameterField,
                        QgsProcessingParameterString,
                        QgsProcessingParameterNumber,
-                       QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
-                       QgsFields,
-                       QgsProcessingParameterCrs)
-from ..mm.map_matcher import MapMatcher
+                       QgsProject,
+                       QgsProcessingParameterFeatureSink,
+                       QgsWkbTypes)
+import processing
 import time, os.path
 
 
-class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
+class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
     '''
     This is an example algorithm that takes a vector layer and
     creates a new identical one.
@@ -68,12 +66,8 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
 
     NETWORK = 'NETWORK'
     TRAJECTORY = 'TRAJECTORY'
-    TRAJECTORY_ID = 'TRAJECTORY_ID'
-    CRS = 'CRS'
-    SIGMA = 'SIGMA'
-    MY = 'MY'
-    BETA = 'BETA'
-    MAX_SEARCH_DISTANCE = 'MAX_SEARCH_DISTANCE'
+    ORDER_FIELD = 'ORDER_FIELD'
+    BUFFER_RADIUS = 'BUFFER_RADIUS'
     OUTPUT = 'OUTPUT'
 
     def initAlgorithm(self, config):
@@ -100,56 +94,19 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         
         self.addParameter(
             QgsProcessingParameterField(
-                self.TRAJECTORY_ID,
-                self.tr('Trajectory ID'),
+                self.ORDER_FIELD,
+                self.tr('Order Trajectory by'),
                 parentLayerParameterName=self.TRAJECTORY,
                 type=QgsProcessingParameterField.Any
             )
         )
         
         self.addParameter(
-            QgsProcessingParameterCrs(
-                self.CRS,
-                self.tr('CRS of the Output layer')
-            )
-        )
-        
-        self.addParameter(
             QgsProcessingParameterNumber(
-                self.MAX_SEARCH_DISTANCE,
-                self.tr('Maximum Search Distance [m]'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=20.0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.SIGMA,
-                self.tr('Standard Deviation'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=50.0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.MY,
-                self.tr('Expected Value'),
+                self.BUFFER_RADIUS,
+                self.tr('Buffer radius around the Trajectory'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.BETA,
-                self.tr('Transition Weight'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=30.0,
                 minValue=0.0
             )
         )
@@ -166,13 +123,6 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         Here is where the processing itself takes place.
         '''
         start_time = time.time()
-        mm = MapMatcher()
-        
-        #create a QgsFields-object
-        attrs = mm.defineAttributes()
-        fields = QgsFields()
-        for field in attrs:
-            fields.append(field)
         
         #extract all parameters
         network_layer = self.parameterAsVectorLayer(
@@ -187,63 +137,76 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
             context
         )
         
-        trajectory_id = self.parameterAsString(
+        trajectory_order_field = self.parameterAsString(
             parameters,
-            self.TRAJECTORY_ID,
+            self.ORDER_FIELD,
             context
         )
         
-        crs = self.parameterAsCrs(
+        buffer = self.parameterAsDouble(
             parameters,
-            self.CRS,
-            context
-        )
-        
-        sigma = self.parameterAsDouble(
-            parameters,
-            self.SIGMA,
-            context
-        )
-        
-        my = self.parameterAsDouble(
-            parameters,
-            self.MY,
-            context
-        )
-        
-        beta = self.parameterAsDouble(
-            parameters,
-            self.BETA,
-            context
-        )
-        
-        max_search_distance = self.parameterAsDouble(
-            parameters,
-            self.MAX_SEARCH_DISTANCE,
+            self.BUFFER_RADIUS,
             context
         )
         
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT,
+            parameters,
+            self.OUTPUT,
             context,
-            fields,
+            network_layer.fields(),
             QgsWkbTypes.LineString,
-            crs
+            network_layer.crs()
         )
         
-        error_code = mm.startViterbiMatchingProcessing(trajectory_layer,
-                                                       network_layer,
-                                                       trajectory_id,
-                                                       sigma,
-                                                       my,
-                                                       beta,
-                                                       max_search_distance,
-                                                       sink,
-                                                       feedback)
+        #init the progressbar
+        max_count = 4
+        counter = 0
+        feedback.setProgress(int((counter / max_count) * max_count))
         
-        return {'OUTPUT': dest_id,
-                'ERROR_CODE': error_code,
-                'COMPUTATION_TIME': str(round(time.time() - start_time, 2))}
+        #trajectory to path
+        points_to_path = processing.run("qgis:pointstopath", {
+            'INPUT':trajectory_layer,
+            'ORDER_FIELD':trajectory_order_field,
+            'GROUP_FIELD':None,
+            'DATE_FORMAT':'',
+            'OUTPUT':'memory:path'
+        })
+        counter += 1
+        feedback.setProgress(int((counter / max_count) * max_count))
+        
+        #buffer path
+        buffer = processing.run("native:buffer", {
+            'INPUT':points_to_path['OUTPUT'],
+            'DISTANCE':buffer,
+            'SEGMENTS':5,
+            'END_CAP_STYLE':0,
+            'JOIN_STYLE':0,
+            'MITER_LIMIT':2,
+            'DISSOLVE':False,
+            'OUTPUT':'memory:buffer'})
+        counter += 1
+        feedback.setProgress(int((counter / max_count) * max_count))
+        
+        #clip network
+        clipped_network = processing.run("native:clip", {
+            'INPUT':network_layer,
+            'OVERLAY':buffer['OUTPUT'],
+            'OUTPUT':'memory:clip'})
+        counter += 1
+        feedback.setProgress(int((counter / max_count) * max_count))
+        
+        #multipart to single part
+        single_part_network = processing.run("native:multiparttosingleparts", {
+            'INPUT':clipped_network['OUTPUT'],
+            'OUTPUT':'memory:omm_clipped_network'})
+        counter += 1
+        feedback.setProgress(int((counter / max_count) * max_count))
+        
+        #add the result to the QGIS project
+        sink.addFeatures(single_part_network['OUTPUT'].getFeatures())
+        #QgsProject.instance().addMapLayer(single_part_network['OUTPUT'])
+        
+        return {'Finished ^o^': str(round(time.time() - start_time, 2))}
 
     def name(self):
         '''
@@ -253,7 +216,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         '''
-        return 'match_trajectory'
+        return 'clip_network'
     
     def helpUrl(self):
         '''
@@ -268,7 +231,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         '''Returns the text for the help widget, if a help document does exist.'''
         dir = os.path.dirname(__file__)
-        file = os.path.abspath(os.path.join(dir, '..', 'help_docs', 'help_processing_match_trajectory.html'))
+        file = os.path.abspath(os.path.join(dir, '..', 'help_docs', 'help_processing_clipping_network.html'))
         if not os.path.exists(file):
             return ''
         with open(file) as helpf:
@@ -280,7 +243,7 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         Returns the translated algorithm name, which should be used for any
         user-visible display of the algorithm name.
         '''
-        return self.tr('Match Trajectory')
+        return self.tr('Clip Network')
 
     def group(self):
         '''
@@ -297,13 +260,13 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         contain lowercase alphanumeric characters only and no spaces or other
         formatting characters.
         '''
-        return 'Matching'
+        return 'Preprocessing'
     
     def tr(self, string):
         return QCoreApplication.translate('Processing', string)
 
     def createInstance(self):
-        return OfflineMapMatchingAlgorithm()
+        return ClipNetworkAlgorithm()
 
     def icon(self):
-        return QIcon(':/plugins/offline_map_matching/icons/icon.png')
+        return QIcon(':/plugins/offline_map_matching/icons/clipping_icon.png')
