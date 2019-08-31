@@ -19,6 +19,8 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 <img src="screenshots/download_3.png" height="350">
 
 ## Usage
+### Match Trajectory
+<img src="screenshots/mt_call.png"><br>
 - just fill in all entries in the plugin and click the start button
 - the tool provides an explanation for each entry directly in the dialog
 - the plugin will not run correctly, if at least one entry is not filled
@@ -47,6 +49,23 @@ processing.run('omm:match_trajectory', {'NETWORK': 'network_layer',
 ```
 - the ERROR_CODE will be a negative number if an error occured during processing, otherwise it is equal 0
 - the processing plugin writes all messages, also errors, to the QGIS-log (like the GUI-plugin)
+
+### Clip Network
+<img src="screenshots/cn_call.png"><br>
+- This functions can be used to preprocess your network
+- the network will be clipped with a buffer around the trajectory (trajectory will be converted to a linestring first)
+- the tool provides an explanation for each entry directly in the dialog
+- the plugin will not run correctly, if at least one entry is not filled
+- the plugin can be started via the toolbox too
+- the plugin can be started via the processing framework directly in python too
+- example for the python command:
+```python
+processing.run('omm:clip_network', {'NETWORK': 'network_layer',
+                                    'TRAJECTORY': 'trajectory_layer',
+                                    'ORDER_FIELD': 'field_name',
+                                    'BUFFER_RADIUS': 20.0,
+                                    'OUTPUT': 'destination_in_filesystem'})
+```
 
 ## Hints for usage
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
@@ -235,3 +254,6 @@ Haenelt, K. (2007). <i>Der Viterbi-Algorithmus. Eine Erl\ufffduterung der formal
 Retrieved Jul 31, 2018 from 
 <a href="http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf">http://kontext.fraunhofer.de/haenelt/kurs/folien/Haenelt_Viterbi-Tutor.pdf</a>
 <br>
+
+## Other
+The icons are based on products from <a href="https://icons8.com">icons8.com</a>
