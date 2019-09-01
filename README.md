@@ -67,7 +67,7 @@ processing.run('omm:clip_network', {'NETWORK': 'network_layer',
                                     'OUTPUT': 'destination_in_filesystem'})
 ```
 
-## Hints for usage
+## Hints for usage of the map matching
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
 and written to the QGIS-log
 - it is recommended to set the maximum search distance as low as possible, because this setting has a very huge influence on the computation time
@@ -88,7 +88,7 @@ and the more computation time is needed
 - additional python files related to processing framework can be found in the 
 <a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm_processing">mm_processing</a>-folder
 
-## Description of the computation
+## Description of the computation of the map matching
 First, the plugin calculates possible candidate points for each point of the trajectory (observations) (Budig 2012: 10).
 The candidates will be arranged in a candidate graph with n layers, n = count of observation points (Budig 2012: 13).
 After calculating different posibilities, the path with the highest posibility will be found using the Viterbi algorithm.
