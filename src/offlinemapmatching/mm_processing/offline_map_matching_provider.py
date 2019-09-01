@@ -68,7 +68,7 @@ class OfflineMapMatchingProvider(QgsProcessingProvider):
         return 'omm'
 
     def icon(self):
-        return QIcon(':/plugins/offline_map_matching/icon.png')
+        return QIcon(':/plugins/offline_map_matching/icons/icon.png')
     
     def name(self):
         '''

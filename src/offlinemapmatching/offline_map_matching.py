@@ -234,10 +234,10 @@ class OfflineMapMatching:
     def unload(self):
         '''Removes the plugin menu item and icon from QGIS GUI. Remove the processing provider.'''
         for action in self.actions:
-#            self.iface.removePluginVectorMenu(
-#                self.tr(u'&Offline-MapMatching'),
-#                action)
-            self.iface.vectorMenu().removeAction(action)
+            self.iface.removePluginVectorMenu(
+                self.tr(u'&Offline-MapMatching'),
+                action)
+            #self.iface.vectorMenu().removeAction(action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar
