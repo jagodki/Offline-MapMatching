@@ -110,7 +110,8 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterCrs(
                 self.CRS,
-                self.tr('CRS of the Output layer')
+                self.tr('CRS of the Output layer'),
+                defaultValue = 'EPSG:4326' 
             )
         )
         

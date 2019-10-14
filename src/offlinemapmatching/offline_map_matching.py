@@ -99,6 +99,9 @@ class OfflineMapMatching:
         #connect slots and signals
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
         self.dlg.pushButton_start.clicked.connect(self.startMapMatching)
+        
+        #set a default crs to avoid problems in QGIS 3.4 
+        self.dlg.mQgsProjectionSelectionWidget.setCrs(QgsCoordinateReferenceSystem('EPSG:4326')) 
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
