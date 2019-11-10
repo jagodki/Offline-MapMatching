@@ -100,8 +100,8 @@ class OfflineMapMatching:
         self.dlg.comboBox_trajectory.currentIndexChanged.connect(self.startPopulateFieldsComboBox)
         self.dlg.pushButton_start.clicked.connect(self.startMapMatching)
         
-        #set a default crs to avoid problems in QGIS 3.4 
-        self.dlg.mQgsProjectionSelectionWidget.setCrs(QgsCoordinateReferenceSystem('EPSG:4326')) 
+        #set a default crs to avoid problems in QGIS 3.4
+        self.dlg.mQgsProjectionSelectionWidget.setCrs(QgsCoordinateReferenceSystem('EPSG:4326'))
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -209,10 +209,20 @@ class OfflineMapMatching:
         
         #init the preprocessing group with their entries
         menu = QMenu()
+        
+        #add icons
         icon_clip = QIcon(':/plugins/offline_map_matching/icons/clipping_icon.png')
+        icon_density = QIcon(':/plugins/offline_map_matching/icons/reduce_density_icon.png')
         icon_pp = QIcon(':/plugins/offline_map_matching/icons/preprocessing_icon.png')
-        action = menu.addAction(icon_clip, 'Clip Network', self.clipNetwork)
-        action.setObjectName('clip_network')
+        
+        #add actions
+        action_clip = menu.addAction(icon_clip, 'Clip Network', self.clipNetwork)
+        action_clip.setObjectName('clip_network')
+        
+        action_reduce = menu.addAction(icon_density, 'Reduce Trajectory Density', self.reduceDensity)
+        action_reduce.setObjectName('reduce_density')
+        
+        #add main entry
         preprocessing_action = QAction(icon_pp, 'Preprocessing', self.iface.mainWindow())
         preprocessing_action.setMenu(menu)
         self.add_action(
@@ -221,7 +231,6 @@ class OfflineMapMatching:
             action=preprocessing_action,
             parent=self.iface.mainWindow(),
             add_to_toolbar=False)
-        
         
 #        preprocessing_action.setMenu(menu)
 #        self.actions.append(preprocessing_action)
@@ -233,6 +242,9 @@ class OfflineMapMatching:
     
     def clipNetwork(self):
         processing.execAlgorithmDialog('omm:clip_network', {})
+    
+    def reduceDensity(self):
+        processing.execAlgorithmDialog('omm:reduce_trajectory_density', {})
     
     def unload(self):
         '''Removes the plugin menu item and icon from QGIS GUI. Remove the processing provider.'''

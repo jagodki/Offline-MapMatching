@@ -114,7 +114,7 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT,
-                self.tr('Output layer')
+                self.tr('Clipped Network')
             )
         )
 
@@ -173,6 +173,8 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
         })
         counter += 1
         feedback.setProgress(int((counter / max_count) * max_count))
+        if feedback.isCanceled():
+            return {'canceled °o°': str(round(time.time() - start_time, 2))}
         
         #buffer path
         buffer = processing.run("native:buffer", {
@@ -186,6 +188,9 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
             'OUTPUT':'memory:buffer'})
         counter += 1
         feedback.setProgress(int((counter / max_count) * max_count))
+        feedback.pushInfo('created buffer successfully')
+        if feedback.isCanceled():
+            return {'canceled °o°': str(round(time.time() - start_time, 2))}
         
         #clip network
         clipped_network = processing.run("native:clip", {
@@ -194,6 +199,9 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
             'OUTPUT':'memory:clip'})
         counter += 1
         feedback.setProgress(int((counter / max_count) * max_count))
+        feedback.pushInfo('clipped buffer successfully')
+        if feedback.isCanceled():
+            return {'canceled °o°': str(round(time.time() - start_time, 2))}
         
         #multipart to single part
         single_part_network = processing.run("native:multiparttosingleparts", {
@@ -201,12 +209,14 @@ class ClipNetworkAlgorithm(QgsProcessingAlgorithm):
             'OUTPUT':'memory:omm_clipped_network'})
         counter += 1
         feedback.setProgress(int((counter / max_count) * max_count))
+        feedback.pushInfo('created single parts successfully')
+        if feedback.isCanceled():
+            return {'canceled °o°': str(round(time.time() - start_time, 2))}
         
         #add the result to the QGIS project
         sink.addFeatures(single_part_network['OUTPUT'].getFeatures())
-        #QgsProject.instance().addMapLayer(single_part_network['OUTPUT'])
         
-        return {'Finished ^o^': str(round(time.time() - start_time, 2))}
+        return {'OUTPUT': dest_id}
 
     def name(self):
         '''
