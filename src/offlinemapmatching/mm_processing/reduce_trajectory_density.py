@@ -77,7 +77,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 self.TRAJECTORY,
-                self.tr('Trajectory layer'),
+                self.tr('Trajectory Layer'),
                 [QgsProcessing.TypeVectorPoint]
             )
         )
@@ -85,7 +85,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.DISTANCE,
-                self.tr('The minimum distance between to consecutive points'),
+                self.tr('Minimum distance between two consecutive points'),
                 type=QgsProcessingParameterNumber.Double,
                 defaultValue=100,
                 minValue=0.0
