@@ -52,7 +52,7 @@ processing.run('omm:match_trajectory', {'NETWORK': 'network_layer',
 
 ### Clip Network
 <img src="screenshots/cn_call.png"><br>
-- this functions can be used to preprocess your network
+- this function can be used to preprocess your network
 - the network will be clipped with a buffer around the trajectory (trajectory will be converted to a linestring first)
 - the tool provides an explanation for each entry directly in the dialog
 - the plugin will not run correctly, if at least one entry is not filled
@@ -69,7 +69,7 @@ processing.run('omm:clip_network', {'NETWORK': 'network_layer',
 
 ### Reduce Trajectory Density
 <img src="screenshots/rd_call.png"><br>
-- this functions can be used to preprocess your trajectory
+- this function can be used to preprocess your trajectory
 - the distance between two consecutive points of the trajectory will be measured
 - if the distance is less than a value inserted by the user, the second, i.e. the following, point will be removed
 - the trajectory layer will not be changed, the reduced trajectory will be stored in a new layer
