@@ -3,5 +3,6 @@
         <file>icons/icon.png</file>
         <file>icons/clipping_icon.png</file>
         <file>icons/preprocessing_icon.png</file>
+        <file>icons/reduce_density_icon.png</file>
     </qresource>
 </RCC>

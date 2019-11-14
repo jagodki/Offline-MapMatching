@@ -85,57 +85,90 @@ class MapMatcher:
         current = 1
         
         QgsMessageLog.logMessage('initialise data structur...', level=Qgis.Info)
+        feedback.pushInfo('initialise data structur...')
         self.setUp(network_name, trajectory_name, attribute_name, None)
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         
         QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
+        feedback.pushInfo('create candidate graph...')
         check_results = self.hidden_model.createGraph(sigma, my, max_dist)
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if check_results != 0:
-            QgsMessageLog.logMessage('the maximum search distance is too low for one trajectory point point to find at least one candidate', level=Qgis.Info)
+            error_text = 'the maximum search distance is too low for one trajectory point point to find at least one candidate'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Info)
             return -1
         
         QgsMessageLog.logMessage('calculate starting probabilities...', level=Qgis.Info)
+        feedback.pushInfo('calculate starting probabilities...')
         check_results = self.hidden_model.setStartingProbabilities()
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if check_results != 0:
-            QgsMessageLog.logMessage('calculation of starting probabilities was not successfull, maybe an exception was thrown', level=Qgis.Info)
+            error_text = 'calculation of starting probabilities was not successfull, maybe an exception was thrown'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Info)
             return -2
         
         
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
+        feedback.pushInfo('calculate transition probabilities...')
         check_results = self.hidden_model.setTransitionProbabilities(beta)
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if check_results != 0:
-            QgsMessageLog.logMessage('calculation of transition probabilities was not succesfull, have a look on the used parameters and the check the datasets', level=Qgis.Info)
+            error_text = 'calculation of transition probabilities was not succesfull, have a look on the used parameters and the check the datasets'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Info)
             return -3
         
         QgsMessageLog.logMessage('create backtracking...', level=Qgis.Info)
+        feedback.pushInfo('create backtracking...')
         check_results = self.hidden_model.createBacktracking()
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if check_results != 0:
-            QgsMessageLog.logMessage('it was not able to create a complete backtracking, maybe the calculated probabilities are corrupt', level=Qgis.Info)
+            error_text = 'it was not able to create a complete backtracking, maybe the calculated probabilities are corrupt'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Info)
             return -4
         
         QgsMessageLog.logMessage('get most likely path...', level=Qgis.Info)
+        feedback.pushInfo('get most likely path...')
         vertices = self.hidden_model.findViterbiPath()
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if len(vertices) == 0:
-            QgsMessageLog.logMessage('cannot calculate the most likely path, maybe backtracking went wrong, check your parameters', level=Qgis.Critical)
+            error_text = 'cannot calculate the most likely path, maybe backtracking went wrong, check your parameters'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Critical)
             return -5
         
         QgsMessageLog.logMessage('get network path...', level=Qgis.Info)
+        feedback.pushInfo('get network path...')
         features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
         feedback.setProgress(int(current * total))
         current += 1
+        if feedback.isCanceled():
+                return -99
         if features == -1:
-            QgsMessageLog.logMessage('routing between the points of the most likely path does not work', level=Qgis.Critical)
+            error_text = 'routing between the points of the most likely path does not work'
+            feedback.pushInfo(error_text)
+            QgsMessageLog.logMessage(error_text, level=Qgis.Critical)
             return -6
         
         feature_sink.addFeatures(features)
