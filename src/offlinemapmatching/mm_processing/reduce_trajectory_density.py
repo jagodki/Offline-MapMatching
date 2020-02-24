@@ -41,7 +41,8 @@ from qgis.core import (QgsProcessing,
                        QgsCoordinateReferenceSystem,
                        QgsProject,
                        QgsProcessingParameterFeatureSink,
-                       QgsWkbTypes)
+                       QgsWkbTypes,
+                       QgsProcessingParameterBoolean)
 import processing
 import time, os.path
 
@@ -65,6 +66,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
     # calling from the QGIS console.
 
     TRAJECTORY = 'TRAJECTORY'
+    KEEP_LAST_FEATURE = 'KEEP_LAST_FEATURE'
     DISTANCE = 'DISTANCE'
     OUTPUT = 'OUTPUT'
 
@@ -79,6 +81,13 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
                 self.TRAJECTORY,
                 self.tr('Trajectory Layer'),
                 [QgsProcessing.TypeVectorPoint]
+            )
+        )
+        
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.KEEP_LAST_FEATURE,
+                self.tr('Keep the last feature of the trajectory')
             )
         )
         
@@ -118,6 +127,12 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
             context
         )
         
+        KEEP_LAST_FEATURE = self.parameterAsBool(
+            parameters,
+            self.KEEP_LAST_FEATURE,
+            context
+        )
+        
         (output, dest_id) = self.parameterAsSink(
             parameters,
             self.OUTPUT,
@@ -130,6 +145,10 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         #check the inputs
         if trajectory_layer is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.TRAJECTORY))
+        if distance is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.DISTANCE))
+        if KEEP_LAST_FEATURE is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.KEEP_LAST_FEATURE))
         
         #present some information to the user
         feedback.pushInfo('CRS of the trajectory is {}'.format(trajectory_layer.sourceCrs().authid()))
@@ -138,7 +157,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         feedback.setProgress(0)
         
         #reduce the trajectory density
-        result = self.reduceDensity(0, 1, trajectory_layer, distance, output, feedback, trajectory_layer.featureCount())
+        result = self.reduceDensity(0, 1, trajectory_layer, distance, output, feedback, trajectory_layer.featureCount(), KEEP_LAST_FEATURE)
         
         return {'OUTPUT': dest_id}
 
@@ -205,7 +224,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
     def icon(self):
         return QIcon(':/plugins/offline_map_matching/icons/reduce_density_icon.png')
     
-    def reduceDensity(self, startIndex, nextIndex, layer, distance, output, feedback, feature_count):
+    def reduceDensity(self, startIndex, nextIndex, layer, distance, output, feedback, feature_count, KEEP_LAST_FEATURE):
         #handle a pressed cancel button and the progressbar
         feedback.setProgress(int(startIndex / feature_count) * 100)
         if feedback.isCanceled():
@@ -215,7 +234,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         start_feature = None
         trajectory_features = layer.getFeatures()
         
-        for feature in trajectory_features:
+        for index, feature in enumerate(trajectory_features):
             
             #set the starting feature if none and skip to the next loop
             if start_feature is None:
@@ -224,10 +243,14 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
                 continue
                 
             #calculate distance, adjust the starting feature after it if distance is big enough
-            elif start_feature.geometry().distance(feature.geometry()) >= distance:
+            if start_feature.geometry().distance(feature.geometry()) >= distance:
                     output.addFeature(feature)
                     start_feature = feature
             
+            #check, whether we reached the last feature and keep the last vertex if necessary
+            elif KEEP_LAST_FEATURE and index == (layer.featureCount() - 1):
+                output.addFeature(feature)
+        
         return -99
         
     
