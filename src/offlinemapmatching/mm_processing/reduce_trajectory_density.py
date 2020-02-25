@@ -87,7 +87,8 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.KEEP_LAST_FEATURE,
-                self.tr('Keep the last feature of the trajectory')
+                self.tr('Keep the last feature of the trajectory'),
+                optional=True
             )
         )
         
@@ -127,7 +128,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
             context
         )
         
-        KEEP_LAST_FEATURE = self.parameterAsBool(
+        keep_last_feature = self.parameterAsBool(
             parameters,
             self.KEEP_LAST_FEATURE,
             context
@@ -147,8 +148,8 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.invalidSourceError(parameters, self.TRAJECTORY))
         if distance is None:
             raise QgsProcessingException(self.invalidSourceError(parameters, self.DISTANCE))
-        if KEEP_LAST_FEATURE is None:
-            raise QgsProcessingException(self.invalidSourceError(parameters, self.KEEP_LAST_FEATURE))
+        if keep_last_feature is None:
+            keep_last_feature = False
         
         #present some information to the user
         feedback.pushInfo('CRS of the trajectory is {}'.format(trajectory_layer.sourceCrs().authid()))
@@ -157,7 +158,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
         feedback.setProgress(0)
         
         #reduce the trajectory density
-        result = self.reduceDensity(0, 1, trajectory_layer, distance, output, feedback, trajectory_layer.featureCount(), KEEP_LAST_FEATURE)
+        result = self.reduceDensity(0, 1, trajectory_layer, distance, output, feedback, trajectory_layer.featureCount(), keep_last_feature)
         
         return {'OUTPUT': dest_id}
 
@@ -224,7 +225,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
     def icon(self):
         return QIcon(':/plugins/offline_map_matching/icons/reduce_density_icon.png')
     
-    def reduceDensity(self, startIndex, nextIndex, layer, distance, output, feedback, feature_count, KEEP_LAST_FEATURE):
+    def reduceDensity(self, startIndex, nextIndex, layer, distance, output, feedback, feature_count, keep_last_feature):
         #handle a pressed cancel button and the progressbar
         feedback.setProgress(int(startIndex / feature_count) * 100)
         if feedback.isCanceled():
@@ -248,7 +249,7 @@ class ReduceTrajectoryDensity(QgsProcessingAlgorithm):
                     start_feature = feature
             
             #check, whether we reached the last feature and keep the last vertex if necessary
-            elif KEEP_LAST_FEATURE and index == (layer.featureCount() - 1):
+            elif keep_last_feature and index == (layer.featureCount() - 1):
                 output.addFeature(feature)
         
         return -99
