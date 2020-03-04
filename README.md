@@ -72,11 +72,19 @@ processing.run('omm:clip_network', {'NETWORK': 'network_layer',
 - this function can be used to preprocess your trajectory
 - the distance between two consecutive points of the trajectory will be measured
 - if the distance is less than a value inserted by the user, the second, i.e. the following, point will be removed
+- the parameter KEEP_LAST_FEATURE can be used to keep the last point/feature of the trajectory, regardless of the distance between the previous keeped feature (the parameter is optional, default is <i>False</i>)
 - the trajectory layer will not be changed, the reduced trajectory will be stored in a new layer
-- example for the python command:
+- example for the python command without optional parameters:
 ```python
 processing.run('omm:reduce_trajectory_density', {'TRAJECTORY': 'trajectory_layer',
                                                  'DISTANCE': 100.0,
+                                                 'OUTPUT': ':memory'})
+```
+- example for the python command with optional parameters:
+```python
+processing.run('omm:reduce_trajectory_density', {'TRAJECTORY': 'trajectory_layer',
+                                                 'DISTANCE': 100.0,
+                                                 'KEEP_LAST_FEATURE': True,
                                                  'OUTPUT': ':memory'})
 ```
 
