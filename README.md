@@ -245,9 +245,9 @@ and transition probability of the end vertex and the total probability of the pa
         <td><img src="screenshots/legend.png" /></td>
     </tr>
     <tr>
-        <td>st. deviation = 50, max. search dist. = 20, mean difference = 30</td>
-        <td>st. deviation = 50, max. search dist. = 20, mean difference = 35</td>
-        <td>st. deviation = 60, max. search dist. = 50, mean difference = 30</td>
+        <td>st. deviation = 50, max. search dist. = 20, transition weight = 30</td>
+        <td>st. deviation = 50, max. search dist. = 20, transition weight = 35</td>
+        <td>st. deviation = 60, max. search dist. = 50, transition weight = 30</td>
         <td></td>
     </tr>
 </table>
