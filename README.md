@@ -1,6 +1,8 @@
 # Offline-MapMatching
 A <a href="https://github.com/qgis/QGIS">QGIS</a>-plugin for matching a trajectory with a network using a Hidden Markov Model and Viterbi algorithm.
 
+<b>The source code is still under developement and does not show the version available within QGIS.</b>
+
 ## Goal of the project
 Matching a trajectory with a network, e.g. a road network, is a classical task in geoinformatics.
 It can be differentiated into online, i.e. during the measurement of the trajectory like in car navigation,
