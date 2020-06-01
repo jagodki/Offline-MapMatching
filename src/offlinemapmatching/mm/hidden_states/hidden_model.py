@@ -3,6 +3,7 @@ from ..observation.trajectory import *
 from ..observation.observation import *
 from .candidate import *
 from .transition import *
+from ..helper.measurement_statistics import *
 from qgis.core import *
 import os
 from PyQt5.QtWidgets import QProgressBar, QApplication
@@ -17,9 +18,11 @@ class HiddenModel:
         self.candidate_graph = []
         self.candidates = {}
         self.candidates_backtracking = {}
+        self.observation_measurements = MeasurementStatistics()
+        
         self.pb = None
     
-    def createGraph(self, sigma, my, maximum_distance):
+    def createGraph(self, maximum_distance):
         #init progressbar
         self.initProgressbar(len(self.trajectory.observations))
         
@@ -37,32 +40,38 @@ class HiddenModel:
                 QgsMessageLog.logMessage('could not find any candidates for trajectory point ' + str(observation.id), level=Qgis.Info)
                 return -5
             else:
-                #create the current level of the graph
-                current_graph_level = []
+                #create the current level of the graph and the candidate measurements
+                current_graph_level = {}
                 for candidate in candidates:
-                    candidate.calculateEmissionProbability(observation, sigma, my)
-                    current_graph_level.append({'id' : str(self.counter_candidates),
-                                                  'observation_id' : observation.id,
-                                                  'emitted_probability' : candidate.emission_probability,
+                    
+                    #store the distance between candidate and its observation
+                    distance_to_observation = candidate.point.distance(observation.point)
+                    
+                    #store the observation measurements for a later usage of their statistics
+                    #e.g. for calculations of the emission probabilities
+                    self.observation_measurements.addMeasurement(distance_to_observation)
+                    
+                    #candidate.calculateEmissionProbability(observation, sigma, my)
+                    current_graph_level[self.counter_candidates] = {
+                                                  #'observation_id' : observation.id,
+                                                  #'emitted_probability' : candidate.emission_probability,
+                                                  'candidate': candidate,
                                                   'transition_probabilities' : {},
                                                   'transition_probability' : 0.0,
                                                   'curvature_probability' : 0.0,
-                                                  'total_probability' : 0.0})
-                    self.candidates.update({str(self.counter_candidates) : candidate})
+                                                  'total_probability' : 0.0
+                                                  }
+                    
+                    #store the candidate in a dictionary (key can be used to find the candidate in the graph and vice versa)
                     self.counter_candidates += 1
                 
-                #normalise the probabilities and add the current graph level to the graph
+                #add the current graph level to the graph
                 self.candidate_graph.append(current_graph_level)
             
             #update progressbar
             self.updateProgressbar()
         
         return 0
-    
-    def getCandidateById(self, id, level):
-        for entry in self.candidate_graph[level]:
-            if entry.get('id') == id:
-                return entry
     
     def createBacktracking(self):
         #init progressbar
@@ -74,16 +83,18 @@ class HiddenModel:
             
             #the candidates of the first observation have no parent
             if i != 0:
-                for entry in graph_level:
+                for id, entry in graph_level.items():
                     
                     #get all transition probabilities of the current entry and iterate over them to find the highest total probability
-                    transition_probabilities = entry.get('transition_probabilities')
+                    transition_probabilities = entry['transition_probabilities']
                     for key, value in transition_probabilities.items():
-                        current_total_probability = value * entry.get('emitted_probability') * self.getCandidateById(key, i - 1).get('total_probability')
-                        if current_total_probability >= entry.get('total_probability'):
-                            entry.update({'total_probability' : current_total_probability})
-                            entry.update({'transition_probability' : value})
-                            self.candidates_backtracking.update({entry.get('id') : key})
+                        #calculate the emission probability for the current entry/candidate in the graph level
+                        current_total_probability = value * entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0) * self.candidate_graph[i - 1][key]['total_probability']
+                        
+                        if current_total_probability >= entry['total_probability']:
+                            entry['total_probability'] = current_total_probability
+                            entry['transition_probability'] = value
+                            self.candidates_backtracking[id] = key
             
             #update progressbar
             self.updateProgressbar()
@@ -99,30 +110,36 @@ class HiddenModel:
         id = None
         graph_counter = len(self.candidate_graph) - 1
         last_graph_level = self.candidate_graph[graph_counter]
-        for entry in last_graph_level:
-            if entry.get('total_probability') >= highest_prob:
-                highest_prob = entry.get('total_probability')
-                id = entry.get('id')
+        
+        for candidate_id, entry in last_graph_level.items():
+            if entry['total_probability'] >= highest_prob:
+                highest_prob = entry['total_probability']
+                id = candidate_id
         
         #add the last vertex of the path
-        last_candidate = self.getCandidateById(id, graph_counter)
-        viterbi_path.insert(0, {'vertex': self.candidates.get(id),
-                                'total_probability': highest_prob,
-                                'emitted_probability': last_candidate.get('emitted_probability'),
-                                'transition_probability': last_candidate.get('transition_probability'),
-                                'observation_id': last_candidate.get('observation_id')})
+        last_graph_level_entry = self.candidate_graph[graph_counter][id]
+        viterbi_path.insert(0, {'vertex': last_graph_level_entry["candidate"],
+                            'total_probability': highest_prob,
+                            'emitted_probability': last_graph_level_entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0),
+                            'transition_probability': last_graph_level_entry['transition_probability'],
+                            'observation_id': last_graph_level_entry["candidate"].observation_id
+                            })
         
         #now find all parents of this vertex/candidate
         graph_counter -= 1
-        current_id = self.candidates_backtracking.get(id)
+        current_id = self.candidates_backtracking[id]
         while(current_id is not None and graph_counter >= 0):
-            searched_candidate = self.getCandidateById(current_id, graph_counter)
-            viterbi_path.insert(0, {'vertex': self.candidates.get(current_id),
-                                    'total_probability': searched_candidate.get('total_probability'),
-                                    'emitted_probability': searched_candidate.get('emitted_probability'),
-                                    'transition_probability': searched_candidate.get('transition_probability'),
-                                    'observation_id': searched_candidate.get('observation_id')})
-            current_id = self.candidates_backtracking.get(current_id)
+            searched_graph_level_entry = self.candidate_graph[graph_counter][current_id]
+            viterbi_path.insert(0, {'vertex': searched_graph_level_entry["candidate"],
+                                    'total_probability': searched_graph_level_entry['total_probability'],
+                                    'emitted_probability': searched_graph_level_entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0),
+                                    'transition_probability': searched_graph_level_entry['transition_probability'],
+                                    'observation_id': searched_graph_level_entry["candidate"].observation_id
+                                    })
+            #preparation for the next iteration
+            if current_id in self.candidates_backtracking:
+                current_id = self.candidates_backtracking[current_id]
+            
             graph_counter -= 1
         
         return viterbi_path
@@ -140,13 +157,13 @@ class HiddenModel:
                 previous_graph_level = self.candidate_graph[i - 1]
                 current_graph_level = self.candidate_graph[i]
                 
-                for previous_entry in previous_graph_level:
+                for previous_id, previous_entry in previous_graph_level.items():
                     
-                    for current_entry in current_graph_level:
+                    for current_id, current_entry in current_graph_level.items():
                         
                         #get the candidates
-                        current_candidate = self.candidates.get(current_entry.get('id'))
-                        previous_candidate = self.candidates.get(previous_entry.get('id'))
+                        current_candidate = current_entry["candidate"]
+                        previous_candidate = previous_entry["candidate"]
                         
                         #create a new transition
                         transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
@@ -161,7 +178,7 @@ class HiddenModel:
                             #return -1
                         
                         #insert the probability into the graph
-                        current_entry.get('transition_probabilities').update({previous_entry.get('id') : transition.transition_probability})
+                        current_entry['transition_probabilities'] = {previous_id : transition.transition_probability}
 
             self.updateProgressbar()
             
@@ -181,14 +198,15 @@ class HiddenModel:
             return False
 
     def setStartingProbabilities(self):
-        first_tellis_level = self.candidate_graph[0]
+        first_graph_level = self.candidate_graph[0]
         
         #init progressbar
-        self.initProgressbar(len(first_tellis_level))
+        self.initProgressbar(len(first_graph_level))
         
-        for entry in first_tellis_level:
-            entry.update({'total_probability' : entry.get('emitted_probability')})
-            self.candidates_backtracking.update({entry.get('id') : None})
+        for id, entry in first_graph_level.items():
+            entry['total_probability'] = entry['candidate'].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0)
+            self.candidates_backtracking[id] = None
+            
             self.updateProgressbar()
         
         return 0

@@ -10,9 +10,12 @@ class Observation:
     
     def getCandidates(self, network_layer, max_distance):
         candidates = []
+        
+        #iterate over all lines of the network to check for candidates on this lines
         for feature in network_layer.getFeatures():
             polyline = feature.geometry()
-            if self.point.distance(polyline) <= max_distance:
-                candidates.append(Candidate(polyline.nearestPoint(self.point)))
+            distance = self.point.distance(polyline)
+            if distance <= max_distance:
+                candidates.append(Candidate(polyline.nearestPoint(self.point), distance, self.id))
         return candidates
     
