@@ -5,7 +5,7 @@ from .candidate import *
 from .transition import *
 from ..helper.measurement_statistics import *
 from qgis.core import *
-import os
+import os, math
 from PyQt5.QtWidgets import QProgressBar, QApplication
 from PyQt5.QtCore import QVariant, QDir
 
@@ -19,7 +19,7 @@ class HiddenModel:
         self.candidates = {}
         self.candidates_backtracking = {}
         self.observation_measurements = MeasurementStatistics()
-        
+        self.transition_measurements = MeasurementStatistics()
         self.pb = None
     
     def createGraph(self, maximum_distance):
@@ -35,7 +35,7 @@ class HiddenModel:
         for observation in self.trajectory.observations:
             
             #extract all candidates of the current observation
-            candidates = observation.getCandidates(self.network.vector_layer, maximum_distance)
+            candidates = observation.getCandidates(self.network, maximum_distance)
             if len(candidates) == 0:
                 QgsMessageLog.logMessage('could not find any candidates for trajectory point ' + str(observation.id), level=Qgis.Info)
                 return -5
@@ -44,12 +44,9 @@ class HiddenModel:
                 current_graph_level = {}
                 for candidate in candidates:
                     
-                    #store the distance between candidate and its observation
-                    distance_to_observation = candidate.point.distance(observation.point)
-                    
                     #store the observation measurements for a later usage of their statistics
                     #e.g. for calculations of the emission probabilities
-                    self.observation_measurements.addMeasurement(distance_to_observation)
+                    self.observation_measurements.addMeasurement(candidate.distance_to_observation)
                     
                     #candidate.calculateEmissionProbability(observation, sigma, my)
                     current_graph_level[self.counter_candidates] = {
@@ -87,14 +84,26 @@ class HiddenModel:
                     
                     #get all transition probabilities of the current entry and iterate over them to find the highest total probability
                     transition_probabilities = entry['transition_probabilities']
-                    for key, value in transition_probabilities.items():
-                        #calculate the emission probability for the current entry/candidate in the graph level
-                        current_total_probability = value * entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0) * self.candidate_graph[i - 1][key]['total_probability']
+                    for previous_id, transition in transition_probabilities.items():
+                        
+                        #calculate the probabilities of the current transition
+                        start_observation = self.trajectory.observations[i - 1]
+                        end_observation = self.trajectory.observations[i]
+                        distance_between_observations = start_observation.point.distance(end_observation.point)
+                        transition.setDirectionProbability(start_observation, end_observation)
+                        transition.setRoutingProbability(distance_between_observations, self.transition_measurements.getStandardDeviation())
+                        transition.setTransitionProbability()
+                        
+                        #calculate the total probability and compare it
+                        current_total_probability = transition.transition_probability * entry['candidate'].getEmissionProbability(self.observation_measurements.getStandardDeviation(), self.observation_measurements.getMeanValue())# * self.candidate_graph[i - 1][key]['total_probability']
+                        
+#                        #calculate the emission probability for the current entry/candidate in the graph level
+#                        current_total_probability = value * entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0) * self.candidate_graph[i - 1][key]['total_probability']
                         
                         if current_total_probability >= entry['total_probability']:
                             entry['total_probability'] = current_total_probability
-                            entry['transition_probability'] = value
-                            self.candidates_backtracking[id] = key
+                            entry['transition_probability'] = transition.transition_probability
+                            self.candidates_backtracking[id] = previous_id
             
             #update progressbar
             self.updateProgressbar()
@@ -119,7 +128,7 @@ class HiddenModel:
         #add the last vertex of the path
         last_graph_level_entry = self.candidate_graph[graph_counter][id]
         viterbi_path.insert(0, {'vertex': last_graph_level_entry["candidate"],
-                            'total_probability': highest_prob,
+                                'total_probability': highest_prob,
                             'emitted_probability': last_graph_level_entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0),
                             'transition_probability': last_graph_level_entry['transition_probability'],
                             'observation_id': last_graph_level_entry["candidate"].observation_id
@@ -144,7 +153,7 @@ class HiddenModel:
         
         return viterbi_path
     
-    def setTransitionProbabilities(self, beta):
+    def setTransitions(self):
         #init progressbar
         self.initProgressbar(len(self.trajectory.observations))
         
@@ -169,16 +178,18 @@ class HiddenModel:
                         transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
                         
                         #calculate the probabilities of the transition
-                        transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
-                        transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
-                        transition.setTransitionProbability()
+#                        transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)
+#                        transition.setRoutingProbability(observation.point.distance(self.trajectory.observations[i - 1].point), beta)
+#                        transition.setTransitionProbability()
                         
-                        #from v2.2.0 the calculation of the transition posibility does not return anything
-                        #if result == False:
-                            #return -1
+                        #calculate the difference of the distances between candidates and observations
+                        transition_length = transition.getLengthOfTransition()
+                        observation_distance = math.sqrt(math.pow(observation.point.asPoint().x() - self.trajectory.observations[i - 1].point.asPoint().x(), 2) + math.pow(observation.point.asPoint().y() - self.trajectory.observations[i - 1].point.asPoint().y(), 2))
+                        self.transition_measurements.addMeasurement(abs(transition_length - observation_distance))
                         
-                        #insert the probability into the graph
-                        current_entry['transition_probabilities'] = {previous_id : transition.transition_probability}
+                        #insert the transition into the graph
+#                        current_entry['transition_probabilities'] = {previous_id : transition.transition_probability}
+                        current_entry['transition_probabilities'] = {previous_id : transition}
 
             self.updateProgressbar()
             

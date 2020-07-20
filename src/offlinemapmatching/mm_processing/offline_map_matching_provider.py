@@ -32,12 +32,11 @@ __revision__ = '$Format:%H$'
 
 from qgis.core import QgsProcessingProvider
 from PyQt5.QtGui import QIcon
-from .map_matching.offline_map_matching_algorithm import OfflineMapMatchingAlgorithm
-from .map_matching.map_matching_preparation_algorithm import MapMatchingPreparation
-from .preprocessing.clip_network_algorithm import ClipNetworkAlgorithm
-from .preprocessing.reduce_trajectory_density import ReduceTrajectoryDensity
-from .preprocessing.calculate_all_shortest_paths import CalculateAllShortestPaths
-from .preprocessing.ripped_up_network import RipUpNetwork
+from .offline_map_matching_algorithm import OfflineMapMatchingAlgorithm
+from .clip_network_algorithm import ClipNetworkAlgorithm
+from .reduce_trajectory_density import ReduceTrajectoryDensity
+from .fast_trajectory_matching import FastTrajectoryMatching
+
 
 class OfflineMapMatchingProvider(QgsProcessingProvider):
 
@@ -46,11 +45,9 @@ class OfflineMapMatchingProvider(QgsProcessingProvider):
 
         # Load algorithms
         self.alglist = [OfflineMapMatchingAlgorithm(),
-                        MapMatchingPreparation(),
-                        CalculateAllShortestPaths(),
+                        FastTrajectoryMatching(),
                         ClipNetworkAlgorithm(),
-						ReduceTrajectoryDensity(),
-                        RipUpNetwork()]
+						ReduceTrajectoryDensity()]
 
     def unload(self):
         '''

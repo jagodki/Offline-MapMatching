@@ -1,10 +1,53 @@
 from qgis.analysis import *
 from qgis.core import *
+from .intersection import *
+import processing
 
 class Network:
     
+#    def __init__(self, linestring_layer, precalculated_network):
     def __init__(self, linestring_layer):
         self.vector_layer = linestring_layer
+        self.intersections = []
+        self.extractAllIntersections()
+        #self.precalculated_network = precalculated_network
+    
+    def extractAllIntersections(self):
+        #dissolve the network
+        result_dissolve = processing.run("native:dissolve", {
+            'INPUT': self.vector_layer,
+            'OUTPUT': 'memory:dissolve'
+        })
+        
+        #create single geometries from the dissolved network
+        result_single = processing.run("native:multiparttosingleparts", {
+            'INPUT': result_dissolve["OUTPUT"],
+            'OUTPUT': 'memory:single'
+        })
+        
+        #get the line intersections
+        result_intersections = processing.run("native:lineintersections", {
+            'INPUT': result_single["OUTPUT"],
+            'INTERSECT': result_single["OUTPUT"],
+            'OUTPUT': 'memory:intersections'
+        })
+        
+        #remove duplicate geometries
+        result_cleaned = processing.run("qgis:deleteduplicategeometries", {
+            'INPUT': result_intersections["OUTPUT"],
+            'OUTPUT': 'memory:cleaned'
+        })
+        
+        #create intersection objects
+        for feature in result_cleaned["OUTPUT"].getFeatures():
+            intersecting_edges = []
+            
+            #iterate over alle edges of the network
+            for edge in self.vector_layer.getFeatures():
+                if edge.geometry().intersects(feature.geometry()):
+                    intersecting_edges.append(edge.id())
+            
+            self.intersections.append(Intersection(feature.geometry(), intersecting_edges))
     
     def routing(self, start, end):
         #create director and strategy
