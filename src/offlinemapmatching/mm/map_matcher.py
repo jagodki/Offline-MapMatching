@@ -22,7 +22,8 @@ class MapMatcher:
         
         label.setText('create candidate graph...')
         QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
-        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        #check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        check_results = self.hidden_model.createGraph(max_dist)
         if check_results != 0:
             label.setText('error during calculation of candidates...')
             QgsMessageLog.logMessage('the maximum search distance is too low for one trajectory point to find at least one candidate', level=Qgis.Info)
@@ -39,7 +40,8 @@ class MapMatcher:
         
         label.setText('calculate transition probabilities...')
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities(beta)
+        #check_results = self.hidden_model.setTransitionProbabilities(beta)
+        check_results = self.hidden_model.setTransitions()
         if check_results != 0:
             label.setText('error during calculation of transition probabilities...')
             QgsMessageLog.logMessage('calculation of transition probabilities was not succesfull, have a look on the used parameters and the check the datasets', level=Qgis.Info)
@@ -79,7 +81,7 @@ class MapMatcher:
         QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
         return 0
     
-    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, sigma, my, beta, max_dist, feature_sink, feedback):
+    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, max_dist, feature_sink, feedback, fast_map_matching=False):
         check_results = 0
         total = 100.0 / 8
         current = 1
@@ -94,7 +96,8 @@ class MapMatcher:
         
         QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
         feedback.pushInfo('create candidate graph...')
-        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        #check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        check_results = self.hidden_model.createGraph(max_dist)
         feedback.setProgress(int(current * total))
         current += 1
         if feedback.isCanceled():
@@ -121,7 +124,8 @@ class MapMatcher:
         
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
         feedback.pushInfo('calculate transition probabilities...')
-        check_results = self.hidden_model.setTransitionProbabilities(beta)
+        #check_results = self.hidden_model.setTransitionProbabilities(beta)
+        check_results = self.hidden_model.setTransitions(fast_map_matching)
         feedback.setProgress(int(current * total))
         current += 1
         if feedback.isCanceled():
@@ -222,6 +226,7 @@ class MapMatcher:
             self.trajectory = Trajectory(self.getLayer(point_layer), point_attr)
         else:
             self.trajectory = Trajectory(point_layer, point_attr)
+        
         
         self.hidden_model = HiddenModel(self.trajectory, self.network)
         self.hidden_model.pb = pb

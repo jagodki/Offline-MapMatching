@@ -34,16 +34,14 @@ from PyQt5.QtGui import QIcon
 from qgis.core import (QgsProcessing,
                        QgsFeatureSink,
                        QgsProcessingAlgorithm,
-                       QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterFeatureSink,
                        QgsProcessingParameterVectorLayer,
                        QgsProcessingParameterField,
-                       QgsProcessingParameterString,
                        QgsProcessingParameterNumber,
                        QgsWkbTypes,
                        QgsCoordinateReferenceSystem,
                        QgsFields,
-                       QgsProcessingParameterCrs)
+                       QgsProcessingParameterEnum)
 from ..mm.map_matcher import MapMatcher
 import time, os.path
 
@@ -69,11 +67,8 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
     NETWORK = 'NETWORK'
     TRAJECTORY = 'TRAJECTORY'
     TRAJECTORY_ID = 'TRAJECTORY_ID'
-    CRS = 'CRS'
-    SIGMA = 'SIGMA'
-    MY = 'MY'
-    BETA = 'BETA'
     MAX_SEARCH_DISTANCE = 'MAX_SEARCH_DISTANCE'
+    TYPE = 'TYPE'
     OUTPUT = 'OUTPUT'
 
     def initAlgorithm(self, config):
@@ -108,14 +103,6 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         )
         
         self.addParameter(
-            QgsProcessingParameterCrs(
-                self.CRS,
-                self.tr('CRS of the Output layer'),
-                defaultValue = 'EPSG:4326'
-            )
-        )
-        
-        self.addParameter(
             QgsProcessingParameterNumber(
                 self.MAX_SEARCH_DISTANCE,
                 self.tr('Maximum Search Distance [m]'),
@@ -126,32 +113,10 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
         )
         
         self.addParameter(
-            QgsProcessingParameterNumber(
-                self.SIGMA,
-                self.tr('Standard Deviation'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=50.0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.MY,
-                self.tr('Expected Value'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=0,
-                minValue=0.0
-            )
-        )
-        
-        self.addParameter(
-            QgsProcessingParameterNumber(
-                self.BETA,
-                self.tr('Transition Weight'),
-                type=QgsProcessingParameterNumber.Double,
-                defaultValue=30.0,
-                minValue=0.0
+            QgsProcessingParameterEnum(
+                self.TYPE,
+                self.tr('Matching type'),
+                options=["Based on network routing (slow)", "Based on euklidean distances (fast)"]
             )
         )
         
@@ -194,53 +159,49 @@ class OfflineMapMatchingAlgorithm(QgsProcessingAlgorithm):
             context
         )
         
-        crs = self.parameterAsCrs(
-            parameters,
-            self.CRS,
-            context
-        )
-        
-        sigma = self.parameterAsDouble(
-            parameters,
-            self.SIGMA,
-            context
-        )
-        
-        my = self.parameterAsDouble(
-            parameters,
-            self.MY,
-            context
-        )
-        
-        beta = self.parameterAsDouble(
-            parameters,
-            self.BETA,
-            context
-        )
-        
         max_search_distance = self.parameterAsDouble(
             parameters,
             self.MAX_SEARCH_DISTANCE,
             context
         )
         
+        matching_type = self.parameterAsEnum(
+            parameters,
+            self.TYPE,
+            context
+        )
+        
+        #check the CRS of the input layers
+        network_crs = network_layer.sourceCrs().authid()
+        trajectory_crs = trajectory_layer.sourceCrs().authid()
+        if network_crs != trajectory_crs:
+            raise ValueError("The CRS of the both input layers are different (" + network_crs + " and " + trajectory_crs + ").")
+        
         (sink, dest_id) = self.parameterAsSink(
             parameters, self.OUTPUT,
             context,
             fields,
             QgsWkbTypes.LineString,
-            crs
+            network_layer.sourceCrs()
         )
         
+        #check the inputs
+        if network_layer is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.NETWORK))
+        if trajectory_layer is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.TRAJECTORY))
+        if trajectory_id is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.TRAJECTORY_ID))
+        if matching_type is None:
+            raise QgsProcessingException(self.invalidSourceError(parameters, self.TYPE))
+		
         error_code = mm.startViterbiMatchingProcessing(trajectory_layer,
                                                        network_layer,
                                                        trajectory_id,
-                                                       sigma,
-                                                       my,
-                                                       beta,
                                                        max_search_distance,
                                                        sink,
-                                                       feedback)
+                                                       feedback,
+                                                       matching_type == 1)
         
         return {'OUTPUT': dest_id,
                 'ERROR_CODE': error_code,

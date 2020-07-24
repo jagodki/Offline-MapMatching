@@ -35,7 +35,7 @@ from PyQt5.QtGui import QIcon
 from .offline_map_matching_algorithm import OfflineMapMatchingAlgorithm
 from .clip_network_algorithm import ClipNetworkAlgorithm
 from .reduce_trajectory_density import ReduceTrajectoryDensity
-from .fast_trajectory_matching import FastTrajectoryMatching
+# from .fast_trajectory_matching import FastTrajectoryMatching
 
 
 class OfflineMapMatchingProvider(QgsProcessingProvider):
@@ -45,7 +45,7 @@ class OfflineMapMatchingProvider(QgsProcessingProvider):
 
         # Load algorithms
         self.alglist = [OfflineMapMatchingAlgorithm(),
-                        FastTrajectoryMatching(),
+                        #FastTrajectoryMatching(),
                         ClipNetworkAlgorithm(),
 						ReduceTrajectoryDensity()]
 

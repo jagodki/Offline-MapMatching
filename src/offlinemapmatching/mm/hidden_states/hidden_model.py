@@ -153,7 +153,7 @@ class HiddenModel:
         
         return viterbi_path
     
-    def setTransitions(self):
+    def setTransitions(self, fast_map_matching=False):
         #init progressbar
         self.initProgressbar(len(self.trajectory.observations))
         
@@ -175,7 +175,11 @@ class HiddenModel:
                         previous_candidate = previous_entry["candidate"]
                         
                         #create a new transition
-                        transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
+                        transition = None
+                        if fast_map_matching is True:
+                            transition = Transition(previous_candidate, current_candidate, self.network, False, True)
+                        else:
+                            transition = Transition(previous_candidate, current_candidate, self.network, self.candidatesHaveDifferentPositions(current_candidate, previous_candidate))
                         
                         #calculate the probabilities of the transition
 #                        transition.setDirectionProbability(self.trajectory.observations[i - 1], observation)

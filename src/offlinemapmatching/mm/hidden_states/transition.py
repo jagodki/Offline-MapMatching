@@ -3,7 +3,7 @@ import math
 
 class Transition:
     
-    def __init__(self, start_candidate, end_candidate, network, different_positions):
+    def __init__(self, start_candidate, end_candidate, network, different_positions, use_beeline=False):
         self.start_candidate = start_candidate
         self.end_candidate = end_candidate
         self.network = network
@@ -11,6 +11,7 @@ class Transition:
         self.routing_probability = 0.0
         self.transition_probability = 0.0
         self.points_on_network = self.getAllpoints_on_network(network) if different_positions else 0
+        self.use_beeline = use_beeline
     
     def setDirectionProbability(self, start_observation, end_observation):
         #variables to store the slops
@@ -59,7 +60,11 @@ class Transition:
     
     def setRoutingProbability(self, distance_between_observations, beta):
         #get the distance of the shortest path between the two candidates of the current transition
-        distance_on_network = self.getLengthOfTransition()
+        distance_on_network = 0
+        if self.use_beeline is True:
+            distance_on_network = self.getDistanceOfBeeline()
+        else:
+            distance_on_network = self.getLengthOfTransition()
         
         #calculate the difference between the distances of the observations and the candidates
         difference = abs(distance_on_network - distance_between_observations)
@@ -94,4 +99,7 @@ class Transition:
                 else:
                     return distance
             return distance
+    
+    def getDistanceOfBeeline(self):
+        return self.start_candidate.point.distance(self.end_candidate.point)
     
