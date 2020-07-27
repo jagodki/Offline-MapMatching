@@ -200,11 +200,11 @@ class OfflineMapMatching:
         '''Create the menu entries, toolbar icons inside the QGIS GUI and add a new processing provider.'''
         icon_path = ':/plugins/offline_map_matching/icons/icon.png'
         
-        #set up entry for the main gui
+        #set up entries for the gui
         self.add_action(
             icon_path,
             text=self.tr(u'Match Trajectory'),
-            callback=self.run,
+            callback=self.matchTrajectory,
             parent=self.iface.mainWindow())
         
         #init the preprocessing group with their entries
@@ -245,6 +245,12 @@ class OfflineMapMatching:
     
     def reduceDensity(self):
         processing.execAlgorithmDialog('omm:reduce_trajectory_density', {})
+        
+    def fastTrajectoryMatching(self):
+        processing.execAlgorithmDialog('omm:fast_trajectory_matching', {})
+    
+    def matchTrajectory(self):
+        processing.execAlgorithmDialog('omm:match_trajectory', {})
     
     def unload(self):
         '''Removes the plugin menu item and icon from QGIS GUI. Remove the processing provider.'''

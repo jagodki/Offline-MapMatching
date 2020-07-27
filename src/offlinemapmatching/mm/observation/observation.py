@@ -9,6 +9,17 @@ class Observation:
         self.point = point
         self.id = id
     
+    def getAllCandidates(self, network, max_distance):
+        #iterate over all lines of the network to check for candidates on this lines
+        for feature in network.vector_layer.getFeatures():
+            #init some vars
+            linestring = feature.geometry()
+            distance = self.point.distance(linestring)
+            
+            #check whether the distance is equal or less the search distance
+            if distance <= max_distance:
+                candidates.append(Candidate(linestring.nearestPoint(self.point), distance, self.id))
+    
     def getCandidates(self, network, max_distance):
         candidates = []
         intersections_within_distance = []
@@ -26,6 +37,7 @@ class Observation:
             for intersection in intersections_within_distance:
                 if feature.id() in intersection.edge_ids:
                     skip_iteration_step = True
+                    break
             
             #skip the iteration step if necessary
             if skip_iteration_step is True:

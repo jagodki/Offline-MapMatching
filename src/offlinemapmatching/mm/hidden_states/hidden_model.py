@@ -36,6 +36,7 @@ class HiddenModel:
             
             #extract all candidates of the current observation
             candidates = observation.getCandidates(self.network, maximum_distance)
+            #candidates = observation.getAllCandidates(self.network, maximum_distance)
             if len(candidates) == 0:
                 QgsMessageLog.logMessage('could not find any candidates for trajectory point ' + str(observation.id), level=Qgis.Info)
                 return -5
