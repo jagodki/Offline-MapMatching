@@ -29,27 +29,48 @@ class Observation:
             if intersection.geometry.distance(self.point) <= max_distance:
                 intersections_within_distance.append(intersection)
         
+        # #iterate over all lines of the network to check for candidates on this lines
+        # for feature in network.vector_layer.getFeatures():
+            
+            # #check if the current edge intersects an intersection within search distance
+            # skip_iteration_step = False
+            # for intersection in intersections_within_distance:
+                # if feature.id() in intersection.edge_ids:
+                    # skip_iteration_step = True
+                    # break
+            
+            # #skip the iteration step if necessary
+            # if skip_iteration_step is True:
+                # continue
+            
+            # #init some vars
+            # linestring = feature.geometry()
+            # distance = self.point.distance(linestring)
+            
+            # #check whether the distance is equal or less the search distance
+            # if distance <= max_distance:
+                # candidates.append(Candidate(linestring.nearestPoint(self.point), distance, self.id))
+        
         #iterate over all lines of the network to check for candidates on this lines
+        candidate_points = []
         for feature in network.vector_layer.getFeatures():
-            
-            #check if the current edge intersects an intersection within search distance
-            skip_iteration_step = False
-            for intersection in intersections_within_distance:
-                if feature.id() in intersection.edge_ids:
-                    skip_iteration_step = True
-                    break
-            
-            #skip the iteration step if necessary
-            if skip_iteration_step is True:
-                continue
-            
             #init some vars
             linestring = feature.geometry()
             distance = self.point.distance(linestring)
             
             #check whether the distance is equal or less the search distance
             if distance <= max_distance:
-                candidates.append(Candidate(linestring.nearestPoint(self.point), distance, self.id))
+                nearest_point = linestring.nearestPoint(self.point)
+                candidate_is_not_near_to_intersection = True
+                
+                #check, whether the possible candidate is within the range to an intersection
+                for intersection in intersections_within_distance:
+                    if intersection.geometry.distance(nearest_point) <= max_distance:
+                        candidate_is_not_near_to_intersection = False
+                        break
+                
+                if candidate_is_not_near_to_intersection is True:
+                    candidates.append(Candidate(nearest_point, distance, self.id))
         
         #now add the intersections to the candidates
         for intersection in intersections_within_distance:
