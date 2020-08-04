@@ -50,7 +50,16 @@ class HiddenModel:
                     self.observation_measurements.addMeasurement(candidate.distance_to_observation)
                     
                     #candidate.calculateEmissionProbability(observation, sigma, my)
-                    current_graph_level[self.counter_candidates] = {
+#                    current_graph_level[self.counter_candidates] = {
+#                                                  #'observation_id' : observation.id,
+#                                                  #'emitted_probability' : candidate.emission_probability,
+#                                                  'candidate': candidate,
+#                                                  'transition_probabilities' : {},
+#                                                  'transition_probability' : 0.0,
+#                                                  'curvature_probability' : 0.0,
+#                                                  'total_probability' : 0.0
+#                                                  }
+                    current_graph_level.update({self.counter_candidates: {
                                                   #'observation_id' : observation.id,
                                                   #'emitted_probability' : candidate.emission_probability,
                                                   'candidate': candidate,
@@ -58,7 +67,7 @@ class HiddenModel:
                                                   'transition_probability' : 0.0,
                                                   'curvature_probability' : 0.0,
                                                   'total_probability' : 0.0
-                                                  }
+                                                  }})
                     
                     #store the candidate in a dictionary (key can be used to find the candidate in the graph and vice versa)
                     self.counter_candidates += 1
@@ -96,7 +105,7 @@ class HiddenModel:
                         transition.setTransitionProbability()
                         
                         #calculate the total probability and compare it
-                        current_total_probability = transition.transition_probability * entry['candidate'].getEmissionProbability(self.observation_measurements.getStandardDeviation(), self.observation_measurements.getMeanValue())# * self.candidate_graph[i - 1][key]['total_probability']
+                        current_total_probability = transition.transition_probability * entry['candidate'].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0)# * self.candidate_graph[i - 1][key]['total_probability']
                         
 #                        #calculate the emission probability for the current entry/candidate in the graph level
 #                        current_total_probability = value * entry["candidate"].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0) * self.candidate_graph[i - 1][key]['total_probability']
@@ -194,7 +203,7 @@ class HiddenModel:
                         
                         #insert the transition into the graph
 #                        current_entry['transition_probabilities'] = {previous_id : transition.transition_probability}
-                        current_entry['transition_probabilities'] = {previous_id : transition}
+                        current_entry['transition_probabilities'].update({previous_id : transition})
 
             self.updateProgressbar()
             
