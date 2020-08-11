@@ -21,10 +21,12 @@ class HiddenModel:
         self.observation_measurements = MeasurementStatistics()
         self.transition_measurements = MeasurementStatistics()
         self.pb = None
+        self.feedback = None
+        self.feedback_total = 100.0
     
     def createGraph(self, maximum_distance):
         #init progressbar
-        self.initProgressbar(len(self.trajectory.observations))
+        self.initFeedback(len(self.trajectory.observations))
         
         #init data structur
         self.candidate_graph = []
@@ -76,13 +78,13 @@ class HiddenModel:
                 self.candidate_graph.append(current_graph_level)
             
             #update progressbar
-            self.updateProgressbar()
+            self.updateFeedback()
         
         return 0
     
     def createBacktracking(self):
         #init progressbar
-        self.initProgressbar(len(self.candidate_graph))
+        self.initFeedback(len(self.candidate_graph))
         
         self.candidates_backtracking = {}
         
@@ -116,7 +118,7 @@ class HiddenModel:
                             self.candidates_backtracking[id] = previous_id
             
             #update progressbar
-            self.updateProgressbar()
+            self.updateFeedback()
         
         return 0
 
@@ -165,7 +167,7 @@ class HiddenModel:
     
     def setTransitions(self, fast_map_matching=False):
         #init progressbar
-        self.initProgressbar(len(self.trajectory.observations))
+        self.initFeedback(len(self.trajectory.observations))
         
         for i, observation in enumerate(self.trajectory.observations):
             
@@ -205,7 +207,7 @@ class HiddenModel:
 #                        current_entry['transition_probabilities'] = {previous_id : transition.transition_probability}
                         current_entry['transition_probabilities'].update({previous_id : transition})
 
-            self.updateProgressbar()
+            self.updateFeedback()
             
         return 0
     
@@ -226,13 +228,13 @@ class HiddenModel:
         first_graph_level = self.candidate_graph[0]
         
         #init progressbar
-        self.initProgressbar(len(first_graph_level))
+        self.initFeedback(len(first_graph_level))
         
         for id, entry in first_graph_level.items():
             entry['total_probability'] = entry['candidate'].getEmissionProbability(self.observation_measurements.getStandardDeviation(), 0.0)
             self.candidates_backtracking[id] = None
             
-            self.updateProgressbar()
+            self.updateFeedback()
         
         return 0
     
@@ -262,7 +264,7 @@ class HiddenModel:
     
     def getPathOnNetwork(self, vertices, field_array):
         #init progressbar
-        self.initProgressbar(len(vertices))
+        self.initFeedback(len(vertices))
         
         #create an array to store all features
         features = []
@@ -275,7 +277,7 @@ class HiddenModel:
                 
                 #check, whether the two current candidates share the same position or not
                 if self.candidatesHaveDifferentPositions(vertices[i - 1]['vertex'], vertex['vertex']) == False:
-                    self.updateProgressbar()
+                    self.updateFeedback()
                     continue
                 
                 #get all edges of the graph/network along the shortest way from the previous to the current vertex
@@ -304,7 +306,7 @@ class HiddenModel:
                 feature.setAttribute('observation_id_end', vertex['observation_id'])
                 features.append(feature)
             
-            self.updateProgressbar()
+            self.updateFeedback()
         
         return features
     
@@ -319,3 +321,15 @@ class HiddenModel:
             self.pb.setValue(self.pb.value() + 1)
             QApplication.processEvents()
     
+
+    def initFeedback(self, maximum):
+        if self.feedback is not None:
+            print(self.feedback.progress())
+            self.feedback.setProgress(0)
+            self.feedback_total = 100.0 / maximum
+        else:
+            print("feedback is None")
+    
+    def updateFeedback(self):
+        if self.feedback is not None:
+            self.feedback.setProgress(int(self.feedback_total + self.feedback.progress()) + 1)

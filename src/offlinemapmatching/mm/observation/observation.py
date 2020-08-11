@@ -10,6 +10,8 @@ class Observation:
         self.id = id
     
     def getAllCandidates(self, network, max_distance):
+        candidates = []
+        
         #iterate over all lines of the network to check for candidates on this lines
         for feature in network.vector_layer.getFeatures():
             #init some vars
@@ -19,6 +21,8 @@ class Observation:
             #check whether the distance is equal or less the search distance
             if distance <= max_distance:
                 candidates.append(Candidate(linestring.nearestPoint(self.point), distance, self.id))
+        
+        return candidates
     
     def getCandidates(self, network, max_distance):
         candidates = []
