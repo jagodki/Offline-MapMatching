@@ -24,20 +24,16 @@ Hidden Markov Models (HMM) and the Viterbi algorithm.
 - just fill in all entries in the plugin and click the start button
 - the tool provides an explanation for each entry directly in the dialog
 - the plugin will not run correctly, if at least one entry is not filled
-- during the processing the dialog will be deactived until the processing finished
-- information about the current processing step will be written to the QGIS-log and displayed above the progressbar
+- the CRS of the input layers have to be the same, otherwise the calculations will not start
+- information about the current processing step will be written to the log section of the plugin window
 - further information, e.g. detailed information about the algorithm, can be found under the next captions
-- the plugin can be started via the toolbox too
+- the gui of the plugin is based on the processing framework, i.e. it will run in the background without freezing QGIS
 - the plugin can be started via the processing framework directly in python too
 - example for the python command:
 ```python
 processing.run('omm:match_trajectory', {'NETWORK': 'network_layer',
                                         'TRAJECTORY': 'trajectory_layer',
                                         'TRAJECTORY_ID': 'id',
-                                        'CRS': '25833',
-                                        'SIGMA': 50.0,
-                                        'MY': 0.0,
-                                        'BETA': 30.0,
                                         'MAX_SEARCH_DISTANCE': 20.0,
                                         'OUTPUT': 'destination_in_filesystem'})
 ```
@@ -48,7 +44,7 @@ processing.run('omm:match_trajectory', {'NETWORK': 'network_layer',
 'COMPUTATION_TIME': 123.45}
 ```
 - the ERROR_CODE will be a negative number if an error occured during processing, otherwise it is equal 0
-- the processing plugin writes all messages, also errors, to the QGIS-log (like the GUI-plugin)
+- the plugin writes all messages, also errors, to the log of the plugin window
 
 ### Clip Network
 <img src="screenshots/cn_call.png"><br>
@@ -90,35 +86,34 @@ processing.run('omm:reduce_trajectory_density', {'TRAJECTORY': 'trajectory_layer
 
 ## Hints for usage of the map matching
 - the progress of the computation will be displayed with a progressbar (starts from zero for every computation step)
-and written to the QGIS-log
-- it is recommended to set the maximum search distance as low as possible, because this setting has a very huge influence on the computation time
+and written to the log of the plugin window
 - it is recommended to use a low segmented network layer, because candidate points will be searched for
 every linestring, i.e. the more linestrings can be found in the maximum search distance, the more candidates will be found
 and the more computation time is needed
-- use a metric CRS, because distances will be calculated
+- use a metric CRS, because distances will be calculated and compared
 - the quality of the trajectory is very important for a good result, i.e. big outliers should be removed before running the plugin
 (the algorithm does not know, which observation is an outlier, and searches the most likely path for the whole trajectory)
-- the distance between two following points of the trajectory should be 100m or less for better results
 - if positions where measured time-controlled, standing times should be removed before running the plugin
-- multi-geometries are not supported, i.e. layers with this geometry type will not be displayed in the comboboxes
 
 ## Hints for developement
 - the plugin was created using the QGIS-plugin "plugin builder"
 - additional python files related to the Hidden Markov Model and the Viterbi algorithm can be found in the
 <a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm">mm</a>-folder
-- additional python files related to processing framework can be found in the 
+- additional python files related to the processing framework can be found in the 
 <a href="https://github.com/jagodki/Offline-MapMatching/tree/master/src/offlinemapmatching/mm_processing">mm_processing</a>-folder
 
 ## Description of the computation of the map matching
-First, the plugin calculates possible candidate points for each point of the trajectory (observations) (Budig 2012: 10).
+First, the plugin extracts all intersections from the network, that have a distance to at least one trajectory point less or equal the maximum search distance.
+Then, the plugin calculates possible candidate points for each point of the trajectory (observations) (Budig 2012: 10).
+Candidates, that are in a range less or equal the maximum search distance of the extracted intersection points, will be ignored. Therefore these extracted intersections will be used as candidates.
 The candidates will be arranged in a candidate graph with n layers, n = count of observation points (Budig 2012: 13).
-After calculating different posibilities, the path with the highest posibility will be found using the Viterbi algorithm.
+After calculating different posible paths and their probabilities, the path with the highest probability will be found using the Viterbi algorithm.
 Below the different parts of the computation in a nutshell, followed by explicit descriptions of each step:
-- read the input layers
+- read the input layers and initialise the internal data structure and objects
 - calculate candidate points for each trajectory point using the maximum search distance and store them in a graph
 - calculate the probability for each candidate point to be emitted by the correpsonding trajectory point
 - calculate the similarity of the transitions between the observations and their candidates
-- find the best candidates using Viterbi algorithm
+- find the best sequence of candidates using Viterbi algorithm
 - create a layer of linestrings using this candidates
 
 ### Read the input layers
@@ -199,8 +194,11 @@ The most likely path through the HMM, i.e. the path through the candidate graph 
 
 ### Store the path in a new layer
 The founded Viterbi path represents the vertices of the resulting line. A routing between following points of the Viterbi path
-returns linestrings, which will be written to a new memory layer. If you start the plugin with its GUI, i.e. not from the toolbox, the plugin provides
-a style file, so that the new layer will be displayed as a red line.
+returns linestrings, which will be written to the output.
+
+### Parameters of plugin-versions less 3.0.0
+Starting with version 3.0.0, the former parameters standard deviation and transistion weight will be calculated using the formulas of Newson & Krumm (2009).
+This increases the usability of the plugin. The maximum search distance and the quality of the network and trajectory (e.g. density of the trajectory) will now influence the result of the map matching.
 
 ## Attribute Table of the resulting layer
 #### id
