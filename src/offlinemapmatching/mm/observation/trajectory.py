@@ -5,7 +5,10 @@ class Trajectory:
     
     def __init__(self, point_layer, id_field):
         self.observations = []
+        self.extractObservations(point_layer, id_field)
         
+    
+    def extractObservations(self, point_layer, id_field):
         #extract all points from the QGIS layer
         features = point_layer.getFeatures()
         for feature in features:

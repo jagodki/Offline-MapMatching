@@ -10,7 +10,7 @@
 name=Offline-MapMatching
 qgisMinimumVersion=3.0
 description=a QGIS-plugin for matching a trajectory with a network using a Hidden Markov Model and Viterbi algorithm 
-version=2.5.1
+version=3.0.0
 author=Christoph Jung
 email=jagodki.cj@gmail.com
 
@@ -24,6 +24,8 @@ repository=https://github.com/jagodki/Offline-MapMatching
 
 # Uncomment the following line and add your changelog:
 changelog=
+    3.0.0 - new algorithm to improve calculation time
+    	2.5.2 - show icon in plugin manager correctly
 	2.5.1 - make the new parameter from v2.5.0 optional to keep the plugin backward compatible
 	2.5.0 - the algorithm "reduce trajectory density" has a new parameter for keeping the last vertex/feature after processing
 	2.4.0 - add a new preprocessing algorithm (reduce trajectory density)
@@ -50,7 +52,7 @@ tags=trajectory, map matching, viterbi, hmm
 
 homepage=https://github.com/jagodki/Offline-MapMatching
 category=Vector
-icon=icon.png
+icon=icons/icon.png
 # experimental flag
 experimental=False
 

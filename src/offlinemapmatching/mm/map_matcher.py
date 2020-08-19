@@ -22,7 +22,8 @@ class MapMatcher:
         
         label.setText('create candidate graph...')
         QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
-        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        #check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        check_results = self.hidden_model.createGraph(max_dist)
         if check_results != 0:
             label.setText('error during calculation of candidates...')
             QgsMessageLog.logMessage('the maximum search distance is too low for one trajectory point to find at least one candidate', level=Qgis.Info)
@@ -39,7 +40,8 @@ class MapMatcher:
         
         label.setText('calculate transition probabilities...')
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
-        check_results = self.hidden_model.setTransitionProbabilities(beta)
+        #check_results = self.hidden_model.setTransitionProbabilities(beta)
+        check_results = self.hidden_model.setTransitions()
         if check_results != 0:
             label.setText('error during calculation of transition probabilities...')
             QgsMessageLog.logMessage('calculation of transition probabilities was not succesfull, have a look on the used parameters and the check the datasets', level=Qgis.Info)
@@ -79,24 +81,25 @@ class MapMatcher:
         QgsMessageLog.logMessage('finished ^o^', level=Qgis.Info)
         return 0
     
-    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, sigma, my, beta, max_dist, feature_sink, feedback):
+    def startViterbiMatchingProcessing(self, trajectory_name, network_name, attribute_name, max_dist, feature_sink, feedback, fast_map_matching=False):
         check_results = 0
-        total = 100.0 / 8
-        current = 1
+        #total = 100.0 / 8
+        #current = 1
         
         QgsMessageLog.logMessage('initialise data structur...', level=Qgis.Info)
         feedback.pushInfo('initialise data structur...')
-        self.setUp(network_name, trajectory_name, attribute_name, None)
-        feedback.setProgress(int(current * total))
-        current += 1
+        self.setUp(network_name, trajectory_name, attribute_name, feedback)
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         
         QgsMessageLog.logMessage('create candidate graph...', level=Qgis.Info)
         feedback.pushInfo('create candidate graph...')
-        check_results = self.hidden_model.createGraph(sigma, my, max_dist)
-        feedback.setProgress(int(current * total))
-        current += 1
+        #check_results = self.hidden_model.createGraph(sigma, my, max_dist)
+        check_results = self.hidden_model.createGraph(max_dist)
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if check_results != 0:
@@ -108,8 +111,8 @@ class MapMatcher:
         QgsMessageLog.logMessage('calculate starting probabilities...', level=Qgis.Info)
         feedback.pushInfo('calculate starting probabilities...')
         check_results = self.hidden_model.setStartingProbabilities()
-        feedback.setProgress(int(current * total))
-        current += 1
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if check_results != 0:
@@ -121,9 +124,10 @@ class MapMatcher:
         
         QgsMessageLog.logMessage('calculate transition probabilities...', level=Qgis.Info)
         feedback.pushInfo('calculate transition probabilities...')
-        check_results = self.hidden_model.setTransitionProbabilities(beta)
-        feedback.setProgress(int(current * total))
-        current += 1
+        #check_results = self.hidden_model.setTransitionProbabilities(beta)
+        check_results = self.hidden_model.setTransitions(fast_map_matching)
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if check_results != 0:
@@ -135,8 +139,8 @@ class MapMatcher:
         QgsMessageLog.logMessage('create backtracking...', level=Qgis.Info)
         feedback.pushInfo('create backtracking...')
         check_results = self.hidden_model.createBacktracking()
-        feedback.setProgress(int(current * total))
-        current += 1
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if check_results != 0:
@@ -148,8 +152,8 @@ class MapMatcher:
         QgsMessageLog.logMessage('get most likely path...', level=Qgis.Info)
         feedback.pushInfo('get most likely path...')
         vertices = self.hidden_model.findViterbiPath()
-        feedback.setProgress(int(current * total))
-        current += 1
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if len(vertices) == 0:
@@ -161,8 +165,8 @@ class MapMatcher:
         QgsMessageLog.logMessage('get network path...', level=Qgis.Info)
         feedback.pushInfo('get network path...')
         features = self.hidden_model.getPathOnNetwork(vertices, self.defineAttributes())
-        feedback.setProgress(int(current * total))
-        current += 1
+        #feedback.setProgress(int(current * total))
+        #current += 1
         if feedback.isCanceled():
                 return -99
         if features == -1:
@@ -172,8 +176,8 @@ class MapMatcher:
             return -6
         
         feature_sink.addFeatures(features)
-        feedback.setProgress(int(current * total))
-        current += 1
+        #feedback.setProgress(int(current * total))
+        #current += 1
         
         return 0
     
@@ -211,7 +215,7 @@ class MapMatcher:
                 return layer
         return None
     
-    def setUp(self, line_layer, point_layer, point_attr, pb):
+    def setUp(self, line_layer, point_layer, point_attr, feedback):
         if type(line_layer) is str:
             self.network = Network(self.getLayer(line_layer))
         else:
@@ -223,8 +227,9 @@ class MapMatcher:
         else:
             self.trajectory = Trajectory(point_layer, point_attr)
         
+        
         self.hidden_model = HiddenModel(self.trajectory, self.network)
-        self.hidden_model.pb = pb
+        self.hidden_model.feedback = feedback
     
     def defineAttributes(self):
         attributes = [QgsField('id', QVariant.Int),
